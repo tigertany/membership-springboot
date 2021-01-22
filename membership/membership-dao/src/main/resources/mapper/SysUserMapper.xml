@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tany.membership.dao.SysUserMapper">
-
+    <select id="getUserList" resultType="com.tany.membership.vo.UserWithRole">
+        SELECT
+            a.*,
+            d.roles_name,
+            d.roles_code
+        FROM
+            sys_user a
+            LEFT JOIN (
+            SELECT
+                c.user_id,
+                GROUP_CONCAT( `name` ) roles_name,
+                GROUP_CONCAT( `code` ) roles_code
+            FROM
+                sys_role b
+                INNER JOIN sys_user_role c ON c.role_id = b.id
+            GROUP BY
+            c.user_id
+            ) d ON a.id = d.user_id
+         ${ew.customSqlSegment}
+    </select>
 </mapper>
