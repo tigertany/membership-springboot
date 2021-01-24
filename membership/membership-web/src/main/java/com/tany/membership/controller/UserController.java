@@ -1,6 +1,7 @@
 package com.tany.membership.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,9 +38,9 @@ public class UserController {
     @Autowired
     private ISysUserRoleService userRoleService;
 
-    @GetMapping("/list/{pageIndex}")
+    @GetMapping("/")
     public JSONResult getUser(@ModelAttribute(Constant.USER_ID) String userId,
-                              @PathVariable long pageIndex,
+                              @PathParam("index") long pageIndex,
                               @PathParam("search") String search,
                               @PathParam("asc") String orderAsc,
                               @PathParam("desc") String orderDesc)
@@ -53,16 +54,16 @@ public class UserController {
         Page<UserWithRole> page = new Page<>(pageIndex,3); //查询第一页，查询1条数据
 
 
-        LambdaQueryWrapper<UserWithRole> wrapper = new LambdaQueryWrapper<>();
+        QueryWrapper<UserWithRole> wrapper = new QueryWrapper<>();
 
         //设置查询条件
         if (StringUtils.isNotBlank(search)) {
-            wrapper.like(UserWithRole::getAccount, search);
+            wrapper.like("account",search);
         }
 
-        wrapper.like(UserWithRole::getRolesName,"员");
+        wrapper.like("roles_name","员");
+        wrapper.eq("deleted",0);
 
-        wrapper.eq(UserWithRole::getDeleted, 0);
         if (StringUtils.isNotBlank(orderAsc))
         {
             page.addOrder(OrderItem.asc(orderAsc));
@@ -73,7 +74,7 @@ public class UserController {
         }
 
 
-        IPage<UserWithRole> iPage = userService.getUserList(page, wrapper.setEntityClass(UserWithRole.class)); //userService.page(page, wrapper);
+        IPage<UserWithRole> iPage = userService.getUserList(page, wrapper); //userService.page(page, wrapper);
 //        System.out.println("数据总条数： " + iPage.getTotal());
 //        System.out.println("数据总页数： " + iPage.getPages());
 //        System.out.println("当前页数： " + iPage.getCurrent());

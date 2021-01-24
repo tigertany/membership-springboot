@@ -9,124 +9,290 @@
 <body>
 <div id="app">
     <v-app>
-        <v-content>
-            <v-container>Hello world</v-container>
-            <v-data-table
-                    :headers="headers"
-                    :items="desserts"
-                    :items-per-page="5"
-                    class="elevation-1"
-            ></v-data-table>
-        </v-content>
+        <v-app-bar
+                app
+                color="deep-purple"
+                dark
+                :flat="true"
+        >
+            <v-toolbar-title>会员管理系统</v-toolbar-title>
 
+            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+
+
+            <v-spacer></v-spacer>
+
+            <v-btn icon>
+                <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+
+            <v-btn icon>
+                <v-icon>mdi-heart</v-icon>
+            </v-btn>
+
+            <v-menu
+                bottom
+                left
+            >
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                            icon
+                            color="yellow"
+                            v-bind="attrs"
+                            v-on="on"
+                    >
+                        <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item
+                            v-for="(item, i) in items"
+                            :key="i"
+                    >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+        </v-app-bar>
+        <v-main class="grey lighten-3">
+            <v-row  class="pa-3">
+                <v-col cols="2" >
+                    <v-sheet rounded="lg">
+<!--                        <v-navigation-drawer color="transparent" rounded="lg">-->
+
+            <v-list
+                    dense
+                    nav
+                    color="transparent"
+            >
+                    <v-list-item @click="staticTo('home')">
+                        <v-list-item-icon>
+                            <v-icon>mdi-home</v-icon>
+                        </v-list-item-icon>
+
+                        <v-list-item-title>Home</v-list-item-title>
+                    </v-list-item>
+
+                <v-list-item @click="staticTo('news')">
+                    <v-list-item-icon>
+                        <v-icon>mdi-home</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-title>News</v-list-item-title>
+                </v-list-item>
+
+                    <v-list-group
+                            :value="true"
+                            prepend-icon="mdi-account-circle"
+                    >
+                        <template v-slot:activator>
+                            <v-list-item-title>Users</v-list-item-title>
+                        </template>
+
+                        <v-list-group
+                                :value="true"
+                                no-action
+                                sub-group
+                        >
+                            <template v-slot:activator>
+                                <v-list-item-content>
+                                    <v-list-item-title>Admin</v-list-item-title>
+                                </v-list-item-content>
+                            </template>
+
+                            <v-list-item
+                                    v-for="([title, icon], i) in admins"
+                                    :key="i"
+                                    link
+                                    @click="menuClick(title)"
+                            >
+                                <v-list-item-title v-text="title"></v-list-item-title>
+
+                                <v-list-item-icon>
+                                    <v-icon v-text="icon"></v-icon>
+                                </v-list-item-icon>
+                            </v-list-item>
+                        </v-list-group>
+
+                        <v-list-group
+                                no-action
+                                sub-group
+                        >
+                            <template v-slot:activator>
+                                <v-list-item-content>
+                                    <v-list-item-title>Actions</v-list-item-title>
+                                </v-list-item-content>
+                            </template>
+
+                            <v-list-item
+                                    v-for="([title, icon], i) in cruds"
+                                    :key="i"
+                                    link
+                            >
+                                <v-list-item-title v-text="title"></v-list-item-title>
+
+                                <v-list-item-icon>
+                                    <v-icon v-text="icon"></v-icon>
+                                </v-list-item-icon>
+                            </v-list-item>
+                        </v-list-group>
+                    </v-list-group>
+                </v-list>
+<!--                        </v-navigation-drawer>-->
+                    </v-sheet>
+                </v-col>
+                <v-col>
+
+                    <v-sheet
+                            min-height="70vh"
+                            rounded="lg"
+                    >
+                        <v-tabs
+                                rounded="lg"
+                                v-model="tab"
+                                align-with-title
+                                color="deep-purple accent-4"
+                        >
+                            <template v-for="item in items"
+                                     >
+
+
+                                <v-tab
+                                        class="mx-1"
+                                        light
+                                        :key="item"
+                                        :value="item"
+                                        @click="tabSwich(item)"
+                                >
+                                    <v-badge
+                                            color="deep-purple"
+                                            inline
+                                    >
+                                        <template v-slot:badge>
+                                            <v-icon @click="this.alert('a')" class="deep-purple"  >mdi-window-close</v-icon>
+                                        </template>
+                                        <v-btn
+                                                color="deep-purple accent-4"
+                                                :ripple="false"
+                                                plain
+                                                depressed
+                                                
+                                        >
+                                            {{ item }}
+                                        </v-btn>
+                                    </v-badge>
+
+
+                                <!--<v-badge color="grey lighten-3"
+                                         offset-y="0"
+                                >
+                                    <template v-slot:badge>
+                                        <v-icon @click="this.alert('a')" color="deep-purple"  >mdi-window-close</v-icon>
+                                    </template>
+
+                                    {{ item }}
+
+                                </v-badge>-->
+                                </v-tab>
+
+
+                            </template>
+                        </v-tabs>
+                        <v-tabs-items v-model="tab">
+                            <v-tab-item
+                                    v-for="item in items"
+                                    :key="item"
+                                    :id="item"
+                            >
+                                <v-card flat>
+                                    <v-card-text v-text="item"></v-card-text>
+                                    <keep-alive>
+                                    <router-view ></router-view>
+                                    </keep-alive>
+                                </v-card>
+                            </v-tab-item>
+                        </v-tabs-items>
+                    </v-sheet>
+                </v-col>
+                </v-row>
+
+        </v-main>
+        <v-footer
+                color="deep-purple"
+                dark>
+            <v-col
+                    class="text-center"
+                    color="white"
+                    cols="12"
+            >
+                {{ new Date().getFullYear() }} — <strong>版权所有</strong>
+            </v-col>
+        </v-footer>
     </v-app>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-router@3.4.9/dist/vue-router.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
 <script>
+    var home = {
+        template: "<input value='这里是zhuye 部分' />"
+    }
+
+    var news = {
+        template: "<input value='这里是新闻部分' />"
+    }
+
+    var routes = [
+        {path: "/home",name:"home", component: home},
+        {path: "/news",name:"news", component: news},
+        {path: "/", redirect: "/home"}
+    ]
+
+    var router = new VueRouter({
+        routes
+    })
     new Vue({
         el: '#app',
+        router,
         vuetify: new Vuetify(),
         data () {
             return {
-                headers: [
-                    {
-                        text: 'Dessert (100g serving)',
-                        align: 'start',
-                        sortable: false,
-                        value: 'name',
-                    },
-                    { text: 'Calories', value: 'calories' },
-                    { text: 'Fat (g)', value: 'fat' },
-                    { text: 'Carbs (g)', value: 'carbs' },
-                    { text: 'Protein (g)', value: 'protein' },
-                    { text: 'Iron (%)', value: 'iron' },
+                admins: [
+                    ['Management', 'mdi-account-multiple-outline'],
+                    ['Settings', 'mdi-cog-outline'],
                 ],
-                desserts: [
-                    {
-                        name: 'Frozen Yogurt',
-                        calories: 159,
-                        fat: 6.0,
-                        carbs: 24,
-                        protein: 4.0,
-                        iron: '1%',
-                    },
-                    {
-                        name: 'Ice cream sandwich',
-                        calories: 237,
-                        fat: 9.0,
-                        carbs: 37,
-                        protein: 4.3,
-                        iron: '1%',
-                    },
-                    {
-                        name: 'Eclair',
-                        calories: 262,
-                        fat: 16.0,
-                        carbs: 23,
-                        protein: 6.0,
-                        iron: '7%',
-                    },
-                    {
-                        name: 'Cupcake',
-                        calories: 305,
-                        fat: 3.7,
-                        carbs: 67,
-                        protein: 4.3,
-                        iron: '8%',
-                    },
-                    {
-                        name: 'Gingerbread',
-                        calories: 356,
-                        fat: 16.0,
-                        carbs: 49,
-                        protein: 3.9,
-                        iron: '16%',
-                    },
-                    {
-                        name: 'Jelly bean',
-                        calories: 375,
-                        fat: 0.0,
-                        carbs: 94,
-                        protein: 0.0,
-                        iron: '0%',
-                    },
-                    {
-                        name: 'Lollipop',
-                        calories: 392,
-                        fat: 0.2,
-                        carbs: 98,
-                        protein: 0,
-                        iron: '2%',
-                    },
-                    {
-                        name: 'Honeycomb',
-                        calories: 408,
-                        fat: 3.2,
-                        carbs: 87,
-                        protein: 6.5,
-                        iron: '45%',
-                    },
-                    {
-                        name: 'Donut',
-                        calories: 452,
-                        fat: 25.0,
-                        carbs: 51,
-                        protein: 4.9,
-                        iron: '22%',
-                    },
-                    {
-                        name: 'KitKat',
-                        calories: 518,
-                        fat: 26.0,
-                        carbs: 65,
-                        protein: 7,
-                        iron: '6%',
-                    },
+                cruds: [
+                    ['Create', 'mdi-plus-outline'],
+                    ['Read', 'mdi-file-outline'],
+                    ['Update', 'mdi-update'],
+                    ['Delete', 'mdi-delete'],
                 ],
+                tab: null,
+                items: [
+                    //'web', 'shopping', 'videos', 'imagesresources', 'news',
+                ],
+                text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
             }
         },
+        methods:{
+            staticTo(tag){
+                this.items.push(tag)
+
+                this.$router.push('/'+tag);
+                this.tab=tag;//this.items.length-1;
+            },
+            tabSwich(tag){
+                //this.$router.push('/'+tag);
+
+
+            },
+            menuClick(title){
+                alert(title);
+            }
+        }
     })
 </script>
 </body>

@@ -47,7 +47,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		//资源映射处理 通过地址http://localhost:8088/images/xx 可以访问/images/目录下的资源
-        //registry.addResourceHandler("/images/**").addResourceLocations("classpath:/images/");
+        registry.addResourceHandler("/images/**").addResourceLocations("classpath:/images/");
         registry.addResourceHandler("/wximgs/**").addResourceLocations("file://"+path);
         
     }
