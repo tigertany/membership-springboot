@@ -39,15 +39,15 @@ public class UserController {
     private ISysUserRoleService userRoleService;
 
     @GetMapping("/")
-    public JSONResult getUser(@ModelAttribute(Constant.USER_ID) String userId,
-                              @PathParam("index") long pageIndex,
+    public JSONResult getUserList(@ModelAttribute(Constant.USER_ID) String userId,
+                              @PathParam("index") Long pageIndex,
                               @PathParam("search") String search,
                               @PathParam("asc") String orderAsc,
                               @PathParam("desc") String orderDesc)
     {
 
-        if (pageIndex==0) {
-            pageIndex =1;
+        if (pageIndex==null || pageIndex==0) {
+            pageIndex =1l;
         }
 
 
@@ -123,7 +123,7 @@ public class UserController {
     }
 
     @GetMapping("/delete/{ids}")//url:delete/1,2,3
-    public JSONResult getUser(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable Integer[] ids)
+    public JSONResult delUser(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 

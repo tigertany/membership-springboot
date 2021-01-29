@@ -1,7 +1,9 @@
 package com.tany.membership.service;
 
-import com.tany.membership.entity.SysPermissionRelation;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.tany.membership.entity.SysPermissionRelation;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-01-20
  */
 public interface ISysPermissionRelationService extends IService<SysPermissionRelation> {
-
+    boolean saveRolePermission(Long userId,List<SysPermissionRelation> list);
 }

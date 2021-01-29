@@ -25,7 +25,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		String token = request.getHeader(Constant.TOKEN_ID_WX);
+		String token = request.getHeader(Constant.TOKEN_ID);
 		// 说明是 GET 请求是请求静态文件
 		if (!(handler instanceof HandlerMethod)) {
 			return true;
@@ -94,14 +94,15 @@ public class LoginInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	private void returnErrorResponse(HttpServletResponse response, JSONResult result)
-			throws IOException, UnsupportedEncodingException {
+	private void returnErrorResponse(HttpServletResponse response, JSONResult result) {
 
 		response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-		ServletOutputStream servletOutputStream = response.getOutputStream();
+
 		BufferedOutputStream bufferedOutputStream = null;
-		
+		ServletOutputStream servletOutputStream =null;
+
 		try {
+			servletOutputStream = response.getOutputStream();
 			bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
 			bufferedOutputStream.write(JsonUtils.objectToJson(result).getBytes("utf-8"));
 			bufferedOutputStream.flush();
@@ -113,7 +114,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 			if (null != bufferedOutputStream) {
 				try {
 					bufferedOutputStream.close();
-				} catch (IOException ex) {
+				} catch (Exception ex) {
 					ex.printStackTrace();
 					CommonUtils.printException(logger, ex);
 				}
@@ -121,7 +122,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 			if (null != servletOutputStream) {
 				try {
 					servletOutputStream.close();
-				} catch (IOException ex) {
+				} catch (Exception ex) {
 					ex.printStackTrace();
 					CommonUtils.printException(logger, ex);
 				}

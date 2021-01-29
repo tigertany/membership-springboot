@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
 
 	@ModelAttribute(Constant.USER_ID)
 	public String getUserId(HttpServletRequest request) {
-		String token = request.getHeader(Constant.TOKEN_ID_WX);
+		String token = request.getHeader(Constant.TOKEN_ID);
 		if (StringUtils.isNotBlank(token)) {
 			// model.addAttribute(Constant.USER_ID,
 			// JWTUtil.getClaim(token).get(Constant.USER_ID).asString());

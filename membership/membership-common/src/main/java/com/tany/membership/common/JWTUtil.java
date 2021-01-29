@@ -17,7 +17,7 @@ public class JWTUtil {
 	// 过期时间1天
     private static final long EXPIRE_TIME = 24*60*60*1000;
     
-    private static final String SECRET = "sjhlco";
+    private static final String SECRET = "membership-tany";
     /**
      * 校验token是否正确
      * @param token 密钥

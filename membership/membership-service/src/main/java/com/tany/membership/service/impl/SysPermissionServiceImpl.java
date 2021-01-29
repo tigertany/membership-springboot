@@ -1,10 +1,13 @@
 package com.tany.membership.service.impl;
 
-import com.tany.membership.entity.SysPermission;
-import com.tany.membership.dao.SysPermissionMapper;
-import com.tany.membership.service.ISysPermissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tany.membership.dao.SysPermissionMapper;
+import com.tany.membership.entity.SysPermission;
+import com.tany.membership.service.ISysPermissionService;
+import com.tany.membership.vo.PermissionWithChecked;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +19,22 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements ISysPermissionService {
+
+    @Override
+    public List<PermissionWithChecked> getPermissionByRole(Long roleId) {
+        return this.baseMapper.selectPermissionByRole(roleId);
+    }
+
+    @Override
+    public List<SysPermission> getPermissionByUser(Long userId) {
+
+        if (!permissionCache.containsKey(userId))
+        {
+            permissionCache.put(userId,this.baseMapper.selectPermissionByUser(userId));
+        }
+
+        return permissionCache.get(userId);
+    }
+
 
 }
