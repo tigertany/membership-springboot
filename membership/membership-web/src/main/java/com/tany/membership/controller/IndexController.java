@@ -12,6 +12,6 @@ public class IndexController {
     @Anonymous
     public String index()
     {
-        return "index";
+        return "main";
     }
 }

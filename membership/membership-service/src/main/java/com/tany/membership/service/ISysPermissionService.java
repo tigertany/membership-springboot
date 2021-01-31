@@ -2,6 +2,7 @@ package com.tany.membership.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tany.membership.entity.SysPermission;
+import com.tany.membership.vo.Menu;
 import com.tany.membership.vo.PermissionWithChecked;
 
 import java.util.HashMap;
@@ -24,5 +25,5 @@ public interface ISysPermissionService extends IService<SysPermission> {
 
     List<SysPermission> getPermissionByUser(Long userId);
 
-
+    List<Menu> getMenusByUser(Long userId);
 }

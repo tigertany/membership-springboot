@@ -52,5 +52,77 @@
         WHERE
             G.id = #{userId}
         ) D ON A.id = D.permission_id
+
     </select>
+
+    <resultMap type="Menu" id="MenuResultMap">
+        <id column="id1" property="id"/>
+        <result column="parent_id1" property="parentId"/>
+        <result column="name1" property="menuName"/>
+        <result column="type1" property="type"/>
+        <result column="url1" property="url"/>
+        <result column="icon1" property="icon"/>
+        <result column="idx1" property="idx"/>
+        <collection property="subMenus" ofType="Menu">
+            <id column="id2" property="id"/>
+            <result column="parent_id2" property="parentId"/>
+            <result column="name2" property="menuName"/>
+            <result column="type2" property="type"/>
+            <result column="url2" property="url"/>
+            <result column="icon2" property="icon"/>
+            <result column="idx2" property="idx"/>
+            <collection property="subMenus" ofType="Menu">
+                <id column="id3" property="id"/>
+                <result column="parent_id3" property="parentId"/>
+                <result column="name3" property="menuName"/>
+                <result column="type3" property="type"/>
+                <result column="url3" property="url"/>
+                <result column="icon3" property="icon"/>
+                <result column="idx3" property="idx"/>
+                <collection property="elements" ofType="PageElement">
+                    <id column="id4" property="id"/>
+                    <result column="parent_id4" property="parentId"/>
+                    <result column="name4" property="eleName"/>
+                    <result column="type4" property="type"/>
+                    <result column="icon4" property="icon"/>
+                    <result column="idx4" property="idx"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="getMenusByUser" resultMap="MenuResultMap">
+        select
+          A1.id as id1,A1.parent_id as parent_id1,A1.type as type1,A1.name as name1,A1.url as url1,A1.icon as icon1,A1.sort as idx1
+         ,A2.id as id2,A2.parent_id as parent_id2,A2.name as name2,A2.type as type2,A2.url as url2,A2.icon as icon2,A2.sort as idx2
+         ,A3.id as id3,A3.parent_id as parent_id3,A3.name as name3,A3.type as type3,A3.url as url3,A3.icon as icon3,A3.sort as idx3
+         ,A4.id as id4,A4.parent_id as parent_id4,A4.name as name4,A4.type as type4,A4.url as url4,A4.icon as icon4,A4.sort as idx4
+         from (<include refid="menusData"/>) A1
+        left join (<include refid="menusData"/>) A2 on A1.id=A2.parent_id
+        left join (<include refid="menusData"/>) A3 on A2.id=A3.parent_id
+        left join (<include refid="menusData"/>) A4 on A3.id=A4.parent_id
+        where A1.parent_id=0 and A1.type=1
+        order by A1.sort
+    </select>
+    <sql id="menusData" >
+        SELECT A.* FROM sys_permission A
+	  INNER JOIN (
+	    SELECT
+		B.permission_id,
+		C.id role_id,
+		C.code role_code,
+		C.name role_name,
+		G.username,
+		G.account
+	    FROM
+		sys_permission_relation B
+		INNER JOIN sys_role C ON B.share_id = C.id
+		AND B.type = 1
+		AND C.deleted = 0
+		INNER JOIN sys_user_role F ON F.role_id = C.id
+		INNER JOIN sys_user G ON G.id = F.user_id
+        WHERE
+            G.id = #{userId}
+        ) D ON A.id = D.permission_id
+    </sql>
 </mapper>

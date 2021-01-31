@@ -5,8 +5,9 @@
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="../static/js/vue.min.js"></script>
 </head>
-<body>
+<body>7
 <div id="app">
     <v-app>
         <v-app-bar
@@ -50,6 +51,7 @@
                     <v-list-item
                             v-for="(item, i) in items"
                             :key="i"
+                            link
                     >
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item>
@@ -178,7 +180,7 @@
                                                 :ripple="false"
                                                 plain
                                                 depressed
-                                                
+
                                         >
                                             {{ item }}
                                         </v-btn>

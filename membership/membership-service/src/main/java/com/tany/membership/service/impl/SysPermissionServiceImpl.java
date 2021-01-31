@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tany.membership.dao.SysPermissionMapper;
 import com.tany.membership.entity.SysPermission;
 import com.tany.membership.service.ISysPermissionService;
+import com.tany.membership.vo.Menu;
 import com.tany.membership.vo.PermissionWithChecked;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,11 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
         }
 
         return permissionCache.get(userId);
+    }
+
+    @Override
+    public List<Menu> getMenusByUser(Long userId) {
+        return this.baseMapper.getMenusByUser(userId);
     }
 
 

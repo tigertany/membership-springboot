@@ -77,4 +77,13 @@ public class PermissionController {
 
         return jsonResult;
     }
+
+    @GetMapping("/getmenusbyuser")
+    public JSONResult getMenuByUser(Long userId)
+    {
+        JSONResult jsonResult = new JSONResult();
+        jsonResult.setStatus(HttpStatus.OK);
+        jsonResult.setData(permissionService.getMenusByUser(userId));
+        return jsonResult;
+    }
 }

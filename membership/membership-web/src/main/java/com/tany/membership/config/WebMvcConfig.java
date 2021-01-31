@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-	
+
 	@Value("${weixin.imgpath}")
 	private String path;
 
@@ -37,7 +37,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //		    .addPathPatterns("/weixin/**")
 		    .excludePathPatterns("/user/register","/user/add","/weixin/sign","/weixin/login","/weixin/getopenid");
 		registry.addInterceptor(permissionInterceptor()).addPathPatterns("/**");
-		
+
 	}
 	@Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -49,7 +49,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		//资源映射处理 通过地址http://localhost:8088/images/xx 可以访问/images/目录下的资源
         registry.addResourceHandler("/images/**").addResourceLocations("classpath:/images/");
         registry.addResourceHandler("/wximgs/**").addResourceLocations("file://"+path);
-        
+		registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+
     }
 	@Override
     public void addCorsMappings(CorsRegistry registry) {
