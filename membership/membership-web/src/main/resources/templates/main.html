@@ -112,13 +112,10 @@
 
         <v-main>
             <v-container
-                    class="py-8 px-6"
+                    class="py-6 px-4"
                     fluid
             >
-                <v-row>
-                    <v-col cols="12"
-                    >
-                        <v-card>
+                <v-card min-height="100%">
                             <v-tabs
                                     v-model="curTab"
                                     color="deep-purple accent-4"
@@ -137,15 +134,17 @@
                                 <v-tab-item
                                         v-for="(tab,i) in tabs"
                                         :key="i"
+                                        min-height="100%"
                                 >
-                                    <v-card flat>
-                                        <v-card-text>{{ tab.content }}</v-card-text>
-                                    </v-card>
+                                    <iframe :src="'/static'+tab.url"
+                                            :id="`${i}iframe`"
+                                            frameborder="0"
+                                            width="100%"
+                                            :onload="`const oIframe = document.getElementById('${i}iframe');const deviceHeight = document.documentElement.clientHeight;oIframe.style.height = Number(deviceHeight)-160+'px';`"
+                                    ></iframe>
                                 </v-tab-item>
                             </v-tabs-items>
                         </v-card>
-                    </v-col>
-                </v-row>
             </v-container>
         </v-main>
     </v-app>
@@ -180,9 +179,9 @@
 
         },
         mounted(){
-            axios.get('/permission/getmenusbyuser', {
+            axios.get('/api/permission/getmenusbyuser', {
                 params: {
-                    userId:1
+                    CURUSER_ID:1
                 }
             })
             .then((res) => {
@@ -220,7 +219,7 @@
                 let buildTab = {
                     tab:this.menus[i].subMenus[j].menuName,
                     name:this.menus[i].subMenus[j].menuName,
-                    content:this.menus[i].subMenus[j].url,
+                    url:this.menus[i].subMenus[j].url,
                 }
 
 
