@@ -1,11 +1,7 @@
 package com.tany.membership.exception;
 
-import com.auth0.jwt.interfaces.Claim;
 import com.tany.membership.common.CommonUtils;
-import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
-import com.tany.membership.common.JWTUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,13 +10,11 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,7 +27,7 @@ public class GlobalExceptionHandler {
 	 * System.out.println("@InitBinder"); }
 	 */
 
-	@ModelAttribute(Constant.USER_ID)
+	/*@ModelAttribute(Constant.USER_ID)
 	public String getUserId(HttpServletRequest request) {
 		String token = request.getHeader(Constant.TOKEN_ID);
 		if (StringUtils.isNotBlank(token)) {
@@ -45,7 +39,7 @@ public class GlobalExceptionHandler {
 			}
 		}
 		return "";
-	}
+	}*/
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseBody

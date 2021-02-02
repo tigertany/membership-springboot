@@ -23,7 +23,7 @@ public class AccountController {
     @Autowired
     private ISysPermissionService permissionService;
 
-    @PostMapping("login")
+    @PostMapping(Constant.BASE_API_PATH+"/ex/login")
     public JSONResult login(String account,String pwd)
     {
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();

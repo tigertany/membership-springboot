@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @Anonymous
-@RequestMapping("/permission")
+@RequestMapping(Constant.BASE_API_PATH+"/permission")
 public class PermissionController {
     private static final Logger logger = LoggerFactory.getLogger(PermissionController.class);
 
@@ -27,7 +27,7 @@ public class PermissionController {
     private ISysPermissionRelationService relationService;
 
     @GetMapping("/byRole")
-    public JSONResult getPermissionByRole(@ModelAttribute(Constant.USER_ID) String userId,Long roleId)
+    public JSONResult getPermissionByRole(Long roleId)
     {
         JSONResult jsonResult = new JSONResult();
         jsonResult.setStatus(HttpStatus.OK);
@@ -37,17 +37,17 @@ public class PermissionController {
     }
 
     @GetMapping("/byUser")
-    public JSONResult getPermissionByUser(@ModelAttribute(Constant.USER_ID) String curUserId,Long userId)
+    public JSONResult getPermissionByUser(@RequestParam(Constant.CURUSER_ID) Long curUserId)
     {
         JSONResult jsonResult = new JSONResult();
         jsonResult.setStatus(HttpStatus.OK);
-        jsonResult.setData(permissionService.getPermissionByUser(userId));
+        jsonResult.setData(permissionService.getPermissionByUser(curUserId));
         return jsonResult;
     }
 
 
     @PostMapping("/saveRolePermission")
-    public JSONResult saveRolePermission(@ModelAttribute(Constant.USER_ID) Long userId, List<SysPermissionRelation> list)
+    public JSONResult saveRolePermission(@RequestParam(Constant.CURUSER_ID) Long curUserId,Long userId, List<SysPermissionRelation> list)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -63,7 +63,7 @@ public class PermissionController {
     }
 
     @PostMapping("/save")
-    public JSONResult savePermission(@ModelAttribute(Constant.USER_ID) String userId, List<SysPermission> list)
+    public JSONResult savePermission(@RequestParam(Constant.CURUSER_ID) Long curUserId, List<SysPermission> list)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -79,11 +79,11 @@ public class PermissionController {
     }
 
     @GetMapping("/getmenusbyuser")
-    public JSONResult getMenuByUser(Long userId)
+    public JSONResult getMenuByUser(@RequestParam(Constant.CURUSER_ID) Long curUserId)
     {
         JSONResult jsonResult = new JSONResult();
         jsonResult.setStatus(HttpStatus.OK);
-        jsonResult.setData(permissionService.getMenusByUser(userId));
+        jsonResult.setData(permissionService.getMenusByUser(curUserId));
         return jsonResult;
     }
 }

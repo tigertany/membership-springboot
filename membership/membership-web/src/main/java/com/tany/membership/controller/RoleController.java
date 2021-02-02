@@ -27,7 +27,7 @@ import java.util.List;
 
 @RestController
 @Anonymous
-@RequestMapping("/role")
+@RequestMapping(Constant.BASE_API_PATH+"/role")
 public class RoleController {
     private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
     @Autowired
@@ -36,8 +36,7 @@ public class RoleController {
     private ISysUserRoleService userRoleService;
 
     @GetMapping("/")
-    public JSONResult getRoleList(@ModelAttribute(Constant.USER_ID) String userId,
-                                  @PathParam("index") Long pageIndex,
+    public JSONResult getRoleList(@PathParam("index") Long pageIndex,
                                   @PathParam("search") String search,
                                   @PathParam("asc") String orderAsc,
                                   @PathParam("desc") String orderDesc)
@@ -94,7 +93,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public JSONResult getRole(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable String id)
+    public JSONResult getRole(@PathVariable String id)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -120,7 +119,7 @@ public class RoleController {
 
     }
     @GetMapping("/delete/{ids}")
-    public JSONResult delRole(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable Integer[] ids)
+    public JSONResult delRole(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -146,7 +145,8 @@ public class RoleController {
         }
     }
     @PostMapping("save")
-    public JSONResult save(@Validated @RequestBody SysRole role, @ModelAttribute(Constant.USER_ID) String userId)
+    public JSONResult save(@RequestParam(Constant.CURUSER_ID) String curUserId,
+                           @Validated @RequestBody SysRole role)
     {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
@@ -158,7 +158,7 @@ public class RoleController {
         else
         {
             role.setRecordDate(new Date());
-            role.setRecorder(userId);
+            role.setRecorder(curUserId);
             if (roleService.saveOrUpdate(role)) {
                 jsonResult.setStatus(HttpStatus.OK);
                 jsonResult.setMsg("保存成功！");
@@ -174,7 +174,7 @@ public class RoleController {
 
     }
     @PostMapping("setUser")
-    public JSONResult setUser(@ModelAttribute(Constant.USER_ID) String currentUserId, List<SysUserRole> list)
+    public JSONResult setUser(@RequestParam(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list)
     {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());

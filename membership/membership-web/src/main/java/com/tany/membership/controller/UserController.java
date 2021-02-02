@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @Anonymous
-@RequestMapping("/user")
+@RequestMapping(Constant.BASE_API_PATH +"/user")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -39,7 +39,7 @@ public class UserController {
     private ISysUserRoleService userRoleService;
 
     @GetMapping("/")
-    public JSONResult getUserList(@ModelAttribute(Constant.USER_ID) String userId,
+    public JSONResult getUserList(@RequestParam(Constant.CURUSER_ID) String curUserId,
                               @PathParam("index") Long pageIndex,
                               @PathParam("search") String search,
                               @PathParam("asc") String orderAsc,
@@ -97,7 +97,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public JSONResult getUser(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable String id)
+    public JSONResult getUser(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable String id)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -123,7 +123,7 @@ public class UserController {
     }
 
     @GetMapping("/delete/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@ModelAttribute(Constant.USER_ID) String userId,@PathVariable Integer[] ids)
+    public JSONResult delUser(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -152,7 +152,7 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public JSONResult save(@Validated @RequestBody SysUser user,@ModelAttribute(Constant.USER_ID) String userId) {
+    public JSONResult save(@RequestParam(Constant.CURUSER_ID) String curUserId,@Validated @RequestBody SysUser user) {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
 
@@ -165,7 +165,7 @@ public class UserController {
         else
         {
             user.setRecordDate(new Date());
-            user.setRecorder(userId);
+            user.setRecorder(curUserId);
             if (userService.saveOrUpdate(user)) {
                 jsonResult.setStatus(HttpStatus.OK);
                 jsonResult.setMsg("保存成功！");
@@ -182,7 +182,7 @@ public class UserController {
     }
 
     @PostMapping("/setrole")
-    public JSONResult setRole(@ModelAttribute(Constant.USER_ID) String currentUserId, List<SysUserRole> list) {
+    public JSONResult setRole(@RequestParam(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list) {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
 

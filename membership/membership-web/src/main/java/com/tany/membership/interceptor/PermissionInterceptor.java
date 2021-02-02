@@ -1,12 +1,13 @@
 package com.tany.membership.interceptor;
 
-import com.auth0.jwt.interfaces.Claim;
 import com.tany.membership.annotation.AllowPass;
 import com.tany.membership.annotation.Permission;
-import com.tany.membership.common.*;
+import com.tany.membership.common.CommonUtils;
+import com.tany.membership.common.Constant;
+import com.tany.membership.common.JSONResult;
+import com.tany.membership.common.JsonUtils;
 import com.tany.membership.entity.SysPermission;
 import com.tany.membership.service.ISysPermissionService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 
 public class PermissionInterceptor implements HandlerInterceptor{
@@ -84,9 +85,9 @@ public class PermissionInterceptor implements HandlerInterceptor{
 	private boolean checkPermission(HttpServletRequest request, HttpServletResponse response) {
 		logger.info("权限拦截起作用");
 
-		String token = request.getHeader(Constant.TOKEN_ID);
+		Long userId = (Long)request.getAttribute(Constant.CURUSER_ID);
 		String url = request.getRequestURI().trim();
-
+		/*
 		Map<String, Claim> claimMap = JWTUtil.getClaim(token);
 		if (claimMap==null)
 			return false;
@@ -96,7 +97,8 @@ public class PermissionInterceptor implements HandlerInterceptor{
 
 			return false;
 		}
-		List<SysPermission> permissions = permissionService.getPermissionByUser(Long.valueOf(userId));
+		*/
+		List<SysPermission> permissions = permissionService.getPermissionByUser(userId);
 
 		for (SysPermission permission : permissions)
 		{
@@ -112,36 +114,19 @@ public class PermissionInterceptor implements HandlerInterceptor{
 	private void returnErrorResponse(HttpServletResponse response, JSONResult result) {
 
 		response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-
-		BufferedOutputStream bufferedOutputStream = null;
-		ServletOutputStream servletOutputStream =null;
-
 		try {
-			servletOutputStream = response.getOutputStream();
-			bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
-			bufferedOutputStream.write(JsonUtils.objectToJson(result).getBytes("utf-8"));
-			bufferedOutputStream.flush();
+
+			try (ServletOutputStream servletOutputStream = response.getOutputStream();
+				 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(servletOutputStream))
+			{
+				bufferedOutputStream.write(JsonUtils.objectToJson(result).getBytes(StandardCharsets.UTF_8.name()));
+				bufferedOutputStream.flush();
+			}
+
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			CommonUtils.printException(logger, ex);
-		} finally {
-			if (null != bufferedOutputStream) {
-				try {
-					bufferedOutputStream.close();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					CommonUtils.printException(logger, ex);
-				}
-			}
-			if (null != servletOutputStream) {
-				try {
-					servletOutputStream.close();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					CommonUtils.printException(logger, ex);
-				}
-			}
 		}
 
 	}
