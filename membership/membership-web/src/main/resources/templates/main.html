@@ -131,11 +131,10 @@
 
                                 </v-tab>
                             </v-tabs>
-                            <v-tabs-items v-model="curTab" style="height:100%">
+                            <v-tabs-items v-model="curTab" >
                                 <v-tab-item
                                         v-for="(tab,i) in tabs"
                                         :key="i"
-                                        style="height:100%"
                                 >
                                     <iframe :src="'/static'+tab.url"
                                             :id="`${i}iframe`"
