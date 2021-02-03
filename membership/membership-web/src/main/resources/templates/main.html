@@ -10,6 +10,7 @@
         [v-cloak] {
             display: none;
         }
+        iframe{display: block;}
     </style>
 </head>
 <body>
@@ -130,11 +131,11 @@
 
                                 </v-tab>
                             </v-tabs>
-                            <v-tabs-items v-model="curTab">
+                            <v-tabs-items v-model="curTab" style="height:100%">
                                 <v-tab-item
                                         v-for="(tab,i) in tabs"
                                         :key="i"
-                                        min-height="100%"
+                                        style="height:100%"
                                 >
                                     <iframe :src="'/static'+tab.url"
                                             :id="`${i}iframe`"
