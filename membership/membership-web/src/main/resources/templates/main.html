@@ -11,6 +11,7 @@
             display: none;
         }
         iframe{display: block;}
+
     </style>
 </head>
 <body>
@@ -111,15 +112,16 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-main>
+        <v-main tag="div">
             <v-container
                     class="py-6 px-4"
                     fluid
             >
-                <v-card min-height="100%">
+                <v-card min-height="100%" class="d-flex flex-column">
                             <v-tabs
                                     v-model="curTab"
                                     color="deep-purple accent-4"
+                                    class="flex-grow-0"
                             >
                                 <v-tab
                                         v-for="(tab,i) in tabs"
@@ -131,16 +133,20 @@
 
                                 </v-tab>
                             </v-tabs>
-                            <v-tabs-items v-model="curTab" >
+                            <v-tabs-items v-model="curTab"
+                                          style="height:100%"
+                                          class="flex-grow-1">
                                 <v-tab-item
                                         v-for="(tab,i) in tabs"
                                         :key="i"
+                                        style="height:100%"
+
                                 >
                                     <iframe :src="'/static'+tab.url"
                                             :id="`${i}iframe`"
-                                            frameborder="0"
+                                            frameborder="1"
                                             width="100%"
-                                            :onload="`const oIframe = document.getElementById('${i}iframe');const deviceHeight = document.documentElement.clientHeight;oIframe.style.height = Number(deviceHeight)-160+'px';`"
+                                            height="100%"
                                     ></iframe>
                                 </v-tab-item>
                             </v-tabs-items>
@@ -157,6 +163,7 @@
 </body>
 
 <script>
+    //:onload="`const oIframe = document.getElementById('${i}iframe');const deviceHeight = document.documentElement.clientHeight;oIframe.style.height = Number(deviceHeight)-160+'px';`"
     new Vue({
         el: '#app',
         vuetify: new Vuetify(),
@@ -189,10 +196,10 @@
                 console.log(res.data.data);
             })
 
-          this.tabs.push({
-              name:'首页',
-              content:'/default',
-            })
+          // this.tabs.push({
+          //     name:'首页',
+          //     content:'/default',
+          //   })
         },
         methods:{
             extendMenu(menu){
