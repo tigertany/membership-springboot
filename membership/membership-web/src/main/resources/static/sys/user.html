@@ -51,8 +51,9 @@
                                     </template>
                                     <v-card>
                                         <v-card-title>
-                                            <span class="headline">User Profile</span>
+                                            <span class="headline">{{ formTitle }}</span>
                                         </v-card-title>
+
                                         <v-card-text>
                                             <v-container>
                                                 <v-row>
@@ -62,8 +63,8 @@
                                                             md="4"
                                                     >
                                                         <v-text-field
-                                                                label="Legal first name*"
-                                                                required
+                                                                v-model="editedItem.account"
+                                                                label="账号"
                                                         ></v-text-field>
                                                     </v-col>
                                                     <v-col
@@ -72,8 +73,8 @@
                                                             md="4"
                                                     >
                                                         <v-text-field
-                                                                label="Legal middle name"
-                                                                hint="example of helper text only on focus"
+                                                                v-model="editedItem.username"
+                                                                label="用户名"
                                                         ></v-text-field>
                                                     </v-col>
                                                     <v-col
@@ -82,62 +83,47 @@
                                                             md="4"
                                                     >
                                                         <v-text-field
-                                                                label="Legal last name*"
-                                                                hint="example of persistent helper text"
-                                                                persistent-hint
-                                                                required
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col cols="12">
-                                                        <v-text-field
-                                                                label="Email*"
-                                                                required
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col cols="12">
-                                                        <v-text-field
-                                                                label="Password*"
-                                                                type="password"
-                                                                required
+                                                                v-model="editedItem.locked"
+                                                                label="状态"
                                                         ></v-text-field>
                                                     </v-col>
                                                     <v-col
                                                             cols="12"
                                                             sm="6"
+                                                            md="4"
                                                     >
-                                                        <v-select
-                                                                :items="['0-17', '18-29', '30-54', '54+']"
-                                                                label="Age*"
-                                                                required
-                                                        ></v-select>
+                                                        <v-text-field
+                                                                v-model="editedItem.recorder"
+                                                                label="录入人"
+                                                        ></v-text-field>
                                                     </v-col>
                                                     <v-col
                                                             cols="12"
                                                             sm="6"
+                                                            md="4"
                                                     >
-                                                        <v-autocomplete
-                                                                :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-                                                                label="Interests"
-                                                                multiple
-                                                        ></v-autocomplete>
+                                                        <v-text-field
+                                                                v-model="editedItem.recordDate"
+                                                                label="录入时间"
+                                                        ></v-text-field>
                                                     </v-col>
                                                 </v-row>
                                             </v-container>
-                                            <small>*indicates required field</small>
                                         </v-card-text>
+
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
                                             <v-btn
                                                     color="blue darken-1"
                                                     text
-                                                    @click="dialog = false"
+                                                    @click="close"
                                             >
-                                                Close
+                                                Cancel
                                             </v-btn>
                                             <v-btn
                                                     color="blue darken-1"
                                                     text
-                                                    @click="dialog = false"
+                                                    @click="save"
                                             >
                                                 Save
                                             </v-btn>
@@ -165,13 +151,57 @@
                 <br>
 
 
-                                <v-data-table
-                                        :headers="headers"
-                                        :items="desserts"
-                                        :items-per-page="5"
-                                        class="elevation-1"
-                                ></v-data-table>
+                <v-data-table
+                        :headers="headers"
+                        :items="desserts"
+                        :items-per-page="3"
+                        :options.sync="options"
+                        v-on:update:options="options1"
+                        item-key="id"
+                        class="elevation-1"
+                        :loading="loading"
+                        v-model="selected"
+                        :server-items-length="totalDesserts"
+                        show-select
+                        must-sort
+                >
+                    <template v-slot:item.actions="{ item }">
+                        <v-icon
+                                small
+                                class="mr-2"
+                                @click="editItem(item)"
+                        >
+                            mdi-pencil
+                        </v-icon>
+                        <v-icon
+                                small
+                                @click="deleteItem(item)"
+                        >
+                            mdi-delete
+                        </v-icon>
+                    </template>
+                    <template v-slot:no-data>
+                        <v-btn
+                                color="primary"
+                                @click="initialize"
+                        >
+                            Reset
+                        </v-btn>
+                    </template>
 
+                </v-data-table>
+
+                <v-dialog v-model="dialogDelete" max-width="500px" hide-overlay >
+                    <v-card>
+                        <v-card-title class="headline">确认要删除吗?</v-card-title>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                            <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                            <v-spacer></v-spacer>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
                 </v-container>
 
             </v-main>
@@ -193,117 +223,144 @@
             el:'#app',
             vuetify:new Vuetify(),
             data:{
+                loading : false,
                 dialog: false,
+                dialogDelete : false,
+                editedIndex: -1,
+                editedItem: {
+                    id:0,
+                    account: '',
+                    username: '',
+                    locked: 0,
+                    recorder: '',
+                    recordDate: '',
+                },
+                emptyItem: {
+                    id:0,
+                    account: '',
+                    username: '',
+                    locked: 0,
+                    recorder: '',
+                    recordDate: '',
+                },
+                selected: [],
                 headers: [
                     {
-                        text: 'Dessert (100g serving)',
-                        align: 'start',
-                        sortable: false,
-                        value: 'name',
+                        text: '账号',
+                        value: 'account',
                     },
-                    { text: 'Calories', value: 'calories' },
-                    { text: 'Fat (g)', value: 'fat' },
-                    { text: 'Carbs (g)', value: 'carbs' },
-                    { text: 'Protein (g)', value: 'protein' },
-                    { text: 'Iron (%)', value: 'iron' },
+                    { text: '姓名', value: 'username' },
+                    { text: '状态', value: 'locked' },
+                    { text: '录入人', value: 'recorder' },
+                    { text: '录入日期', value: 'recordDate' },
+                    { text: '操作', value: 'actions', sortable: false },
                 ],
-                desserts: [
-                    {
-                        name: 'Frozen Yogurt',
-                        calories: 159,
-                        fat: 6.0,
-                        carbs: 24,
-                        protein: 4.0,
-                        iron: '1%',
-                    },
-                    {
-                        name: 'Ice cream sandwich',
-                        calories: 237,
-                        fat: 9.0,
-                        carbs: 37,
-                        protein: 4.3,
-                        iron: '1%',
-                    },
-                    {
-                        name: 'Eclair',
-                        calories: 262,
-                        fat: 16.0,
-                        carbs: 23,
-                        protein: 6.0,
-                        iron: '7%',
-                    },
-                    {
-                        name: 'Cupcake',
-                        calories: 305,
-                        fat: 3.7,
-                        carbs: 67,
-                        protein: 4.3,
-                        iron: '8%',
-                    },
-                    {
-                        name: 'Gingerbread',
-                        calories: 356,
-                        fat: 16.0,
-                        carbs: 49,
-                        protein: 3.9,
-                        iron: '16%',
-                    },
-                    {
-                        name: 'Jelly bean',
-                        calories: 375,
-                        fat: 0.0,
-                        carbs: 94,
-                        protein: 0.0,
-                        iron: '0%',
-                    },
-                    {
-                        name: 'Lollipop',
-                        calories: 392,
-                        fat: 0.2,
-                        carbs: 98,
-                        protein: 0,
-                        iron: '2%',
-                    },
-                    {
-                        name: 'Honeycomb',
-                        calories: 408,
-                        fat: 3.2,
-                        carbs: 87,
-                        protein: 6.5,
-                        iron: '45%',
-                    },
-                    {
-                        name: 'Donut',
-                        calories: 452,
-                        fat: 25.0,
-                        carbs: 51,
-                        protein: 4.9,
-                        iron: '22%',
-                    },
-                    {
-                        name: 'KitKat',
-                        calories: 518,
-                        fat: 26.0,
-                        carbs: 65,
-                        protein: 7,
-                        iron: '6%',
-                    },
-                ],
+                desserts: [],
+                totalDesserts:-1,
+                options: {
+                    sortBy :['account'],
+                    sortDesc:[false],
+                    page:1,
+                    itemsPerPage:3,
+                    multiSort: false,
+                    mustSort: true,
+                    groupBy: [],
+                    groupDesc:[],
+                },
+            },
+            created () {
+                //this.initialize()
             },
             mounted(){
 
             },
             methods:{
+                options1(options){
+                    console.log(options)
+                },
+                initialize(){
+                    this.loading = true
 
+                    const { sortBy, sortDesc, page, itemsPerPage } = this.options
+
+                    let params ={
+                        index : page,
+                    }
+                    params[sortDesc[0]?'desc':'asc'] = sortBy[0]
+                    axios.get('/api/user?', {
+                        params
+                    }).then((res) => {
+                        this.desserts = res.data.data.rows;
+                        this.totalDesserts = res.data.data.totalRecords
+                        console.log(res.data.data.rows);
+                        this.loading = false
+                    })
+                },
+                editItem (item) {
+                    this.editedIndex = this.desserts.indexOf(item)
+                    this.editedItem = Object.assign({}, item)
+                    this.dialog = true
+                },
+
+                deleteItem (item) {
+                    this.editedIndex = this.desserts.indexOf(item)
+                    this.editedItem = Object.assign({}, item)
+                    this.dialogDelete = true
+                },
+
+                deleteItemConfirm () {
+                    this.desserts.splice(this.editedIndex, 1)
+                    this.closeDelete()
+                },
+
+                close () {
+                    this.dialog = false
+                    this.$nextTick(() => {
+                        this.editedItem = Object.assign({}, this.defaultItem)
+                        this.editedIndex = -1
+                    })
+                },
+
+                closeDelete () {
+                    this.dialogDelete = false
+                    this.$nextTick(() => {
+                        this.editedItem = Object.assign({}, this.defaultItem)
+                        this.editedIndex = -1
+                    })
+                },
+
+                save () {
+                    if (this.editedIndex > -1) {
+                        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+                    } else {
+                        this.desserts.push(this.editedItem)
+                    }
+                    this.close()
+                },
             },
             computed:{
-
+                formTitle () {
+                    return this.editedIndex === -1 ? '新增' : '修改'
+                },
             },
             watch: {
                 // 如果 `question` 发生改变，这个函数就会运行
                 question: function (newQuestion, oldQuestion) {
 
-                }
+                },
+                dialog (val) {
+                    val || this.close()
+                },
+                dialogDelete (val) {
+                    val || this.closeDelete()
+                },
+                // options: {
+                //     handler (val, oldVal) {
+                //         console.log(val,oldVal)
+                //         this.initialize()
+                //     },
+                //     deep: true,
+                // },
             },
         })
     </script>

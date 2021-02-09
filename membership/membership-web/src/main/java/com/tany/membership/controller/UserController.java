@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,12 +37,12 @@ public class UserController {
     @Autowired
     private ISysUserRoleService userRoleService;
 
-    @GetMapping("/")
-    public JSONResult getUserList(@RequestParam(Constant.CURUSER_ID) String curUserId,
-                              @PathParam("index") Long pageIndex,
-                              @PathParam("search") String search,
-                              @PathParam("asc") String orderAsc,
-                              @PathParam("desc") String orderDesc)
+    @GetMapping
+    public JSONResult getUserList(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,
+                              @RequestParam(value = "index",required = false) Long pageIndex,
+                              @RequestParam(value = "search",required = false) String search,
+                              @RequestParam(value = "asc",required = false) String orderAsc,
+                              @RequestParam(value = "desc",required = false) String orderDesc)
     {
 
         if (pageIndex==null || pageIndex==0) {
@@ -122,7 +121,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/delete/{ids}")//url:delete/1,2,3
+    @DeleteMapping("/{ids}")//url:delete/1,2,3
     public JSONResult delUser(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
