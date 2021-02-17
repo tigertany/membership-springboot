@@ -23,7 +23,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 
     @Override
     public List<PermissionWithChecked> getPermissionByRole(Long roleId) {
-        return this.baseMapper.selectPermissionByRole(roleId);
+        return this.baseMapper.selectPermissionByRole(roleId,0L);
     }
 
     @Override
@@ -40,6 +40,11 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
     @Override
     public List<Menu> getMenusByUser(Long userId) {
         return this.baseMapper.getMenusByUser(userId);
+    }
+
+    @Override
+    public List<PermissionWithChecked> getPermissionList() {
+        return this.baseMapper.getPermissionList(0L);
     }
 
 

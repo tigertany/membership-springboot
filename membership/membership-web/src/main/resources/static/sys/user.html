@@ -8,22 +8,39 @@
     <link href="/static/vuetify/vuetify.css" rel="stylesheet" />
     <style>
         html{overflow: auto;}
+         [v-cloak] {
+             display: none;
+         }
     </style>
 </head>
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <v-app>
             <v-main class="py-4 px-2">
 
                 <v-card>
                     <v-container fluid >
-                    <v-row no-gutters>
+                    <v-row>
                         <v-col
-                                cols="1"
+                            cols="1"
                         >
                             <v-text-field
-                                    label="搜索"
+                                    label="按账号搜索"
+                                    color="deep-purple accent-4"
                                     clearable
+                                    dense
+                                    v-model="search.account"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col
+                            cols="1"
+                        >
+                            <v-text-field
+                                    label="按用户名搜索"
+                                    color="deep-purple accent-4"
+                                    clearable
+                                    dense
+                                    v-model="search.username"
                             ></v-text-field>
                         </v-col>
                     </v-row>
@@ -34,117 +51,10 @@
                     <v-container fluid >
                         <v-row no-gutters>
                             <v-col cols="12" class="text-right">
-                                <v-dialog
-                                        v-model="dialog"
-                                        persistent
-                                        max-width="600px"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                                color="primary"
-                                                dark
-                                                v-bind="attrs"
-                                                v-on="on"
-                                        >
-                                            新增
-                                        </v-btn>
-                                    </template>
-                                    <v-card>
-                                        <v-card-title>
-                                            <span class="headline">{{ formTitle }}</span>
-                                        </v-card-title>
-
-                                        <v-card-text>
-                                            <v-container>
-                                                <v-row>
-                                                    <v-col
-                                                            cols="12"
-                                                            sm="6"
-                                                            md="4"
-                                                    >
-                                                        <v-text-field
-                                                                v-model="editedItem.account"
-                                                                label="账号"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col
-                                                            cols="12"
-                                                            sm="6"
-                                                            md="4"
-                                                    >
-                                                        <v-text-field
-                                                                v-model="editedItem.username"
-                                                                label="用户名"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col
-                                                            cols="12"
-                                                            sm="6"
-                                                            md="4"
-                                                    >
-                                                        <v-text-field
-                                                                v-model="editedItem.locked"
-                                                                label="状态"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col
-                                                            cols="12"
-                                                            sm="6"
-                                                            md="4"
-                                                    >
-                                                        <v-text-field
-                                                                v-model="editedItem.recorder"
-                                                                label="录入人"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                    <v-col
-                                                            cols="12"
-                                                            sm="6"
-                                                            md="4"
-                                                    >
-                                                        <v-text-field
-                                                                v-model="editedItem.recordDate"
-                                                                label="录入时间"
-                                                        ></v-text-field>
-                                                    </v-col>
-                                                </v-row>
-                                            </v-container>
-                                        </v-card-text>
-
-                                        <v-card-actions>
-                                            <v-spacer></v-spacer>
-                                            <v-btn
-                                                    color="blue darken-1"
-                                                    text
-                                                    @click="close"
-                                            >
-                                                Cancel
-                                            </v-btn>
-                                            <v-btn
-                                                    color="blue darken-1"
-                                                    text
-                                                    @click="save"
-                                            >
-                                                Save
-                                            </v-btn>
-                                        </v-card-actions>
-                                    </v-card>
-                                </v-dialog>
-                                <v-btn color="success"
-                                >
-                                    查询
-                                </v-btn>
-                                <v-btn color="error"
-                                >
-                                    删除
-                                </v-btn>
-                                <v-btn depressed
-                                       color="secondary"
-                                >
-                                    分配角色
-                                </v-btn>
+                                <v-btn color="info" @click="openAdd" >新增</v-btn>
+                                <v-btn color="success" @click="initialize" >查询</v-btn>
+                                <v-btn color="error" @click="openBatchDel(null)" >删除</v-btn>
                             </v-col>
-
                         </v-row>
                     </v-container>
                 </v-card>
@@ -156,7 +66,6 @@
                         :items="desserts"
                         :items-per-page="3"
                         :options.sync="options"
-                        v-on:update:options="options1"
                         item-key="id"
                         class="elevation-1"
                         :loading="loading"
@@ -165,17 +74,39 @@
                         show-select
                         must-sort
                 >
-                    <template v-slot:item.actions="{ item }">
+                    <template v-slot:item.roles="{ item }">
+
+                        <v-chip color="deep-purple accent-4"
+                                class="ma-1"
+                                label
+                                outlined
+                                small
+                                dark
+                                v-for="role in item.roles"  :key="role.id"
+                        >
+                            {{ role.name }}
+                        </v-chip>
+                    </template>
+                    <template v-slot:item.locked="{ item }">
+                        <v-chip :color="statusColor(item.locked)"
+                                dark
+                        >
+                            {{ statusText(item.locked) }}
+                        </v-chip>
+                    </template>
+
+
+                    <template v-slot:item.actions="{ item ,index}">
                         <v-icon
                                 small
                                 class="mr-2"
-                                @click="editItem(item)"
+                                @click="openEdit(item,index)"
                         >
                             mdi-pencil
                         </v-icon>
                         <v-icon
                                 small
-                                @click="deleteItem(item)"
+                                @click="openBatchDel(item)"
                         >
                             mdi-delete
                         </v-icon>
@@ -191,13 +122,133 @@
 
                 </v-data-table>
 
+                <v-dialog
+                        v-model="dialogEdit"
+                        persistent
+                        max-width="600px"
+                >
+
+                    <v-card>
+                        <v-card-title>
+                            <span class="headline">{{ formTitle }}</span>
+                        </v-card-title>
+
+                        <v-card-text>
+                            <v-container>
+                                <v-row>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-text-field
+                                                v-model="editedItem.account"
+                                                label="账号"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-text-field
+                                                v-model="editedItem.username"
+                                                label="用户名"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-checkbox
+                                                label="状态"
+                                                color="deep-purple accent-4"
+                                                v-model="editedItem.locked"
+                                                :true-value="1"
+                                                :false-value="0"
+                                                hide-details
+                                        ></v-checkbox>
+                                    </v-col>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-text-field
+                                                v-model="editedItem.password"
+                                                label="密码"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                    >
+                                        <v-select
+                                                v-model="selectedRoles"
+                                                :items="roleList"
+                                                label="所属角色"
+                                                item-text="name"
+                                                item-value="id"
+                                                multiple
+                                                small-chips
+                                                return-object
+                                                color="deep-purple accent-4"
+                                        ></v-select>
+                                    </v-col>
+                                    <!--<v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-text-field
+                                                v-model="editedItem.recorder"
+                                                label="录入人"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                    >
+                                        <v-text-field
+                                                v-model="editedItem.record_date"
+                                                label="录入时间"
+                                        ></v-text-field>
+                                    </v-col>-->
+                                </v-row>
+                            </v-container>
+                        </v-card-text>
+
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                    color="deep-purple accent-4"
+                                    dark
+                                    @click="save"
+                            >
+                                保存
+                            </v-btn>
+                            <v-btn
+                                    color="deep-purple accent-4"
+                                    text
+                                    dark
+                                    @click="closeEdit"
+                            >
+                                取消
+                            </v-btn>
+
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+
                 <v-dialog v-model="dialogDelete" max-width="500px" hide-overlay >
                     <v-card>
                         <v-card-title class="headline">确认要删除吗?</v-card-title>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                            <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                            <v-btn color="deep-purple accent-4" dark @click="del">OK</v-btn>
+                            <v-btn color="deep-purple accent-4" text @click="closeDel">Cancel</v-btn>
                             <v-spacer></v-spacer>
                         </v-card-actions>
                     </v-card>
@@ -212,6 +263,9 @@
     <script src="/static/vuetify/vuetify.js"></script>
     <script src="/static/axios/axios.js"></script>
     <script>
+        //axios.defaults.headers.post['Content-Type'] ='application/x-www-form-urlencoded'
+
+
         Vue.directive('focus', {
             // 当被绑定的元素插入到 DOM 中时……
             inserted: function (el,binding) {
@@ -224,7 +278,7 @@
             vuetify:new Vuetify(),
             data:{
                 loading : false,
-                dialog: false,
+                dialogEdit: false,
                 dialogDelete : false,
                 editedIndex: -1,
                 editedItem: {
@@ -233,7 +287,7 @@
                     username: '',
                     locked: 0,
                     recorder: '',
-                    recordDate: '',
+                    record_date: '',
                 },
                 emptyItem: {
                     id:0,
@@ -241,18 +295,18 @@
                     username: '',
                     locked: 0,
                     recorder: '',
-                    recordDate: '',
+                    record_date: '',
                 },
                 selected: [],
+                delIds:[],
+                search:{},
                 headers: [
-                    {
-                        text: '账号',
-                        value: 'account',
-                    },
+                    { text: '账号', value: 'account' },
                     { text: '姓名', value: 'username' },
+                    { text: '角色', value: 'roles'},
                     { text: '状态', value: 'locked' },
                     { text: '录入人', value: 'recorder' },
-                    { text: '录入日期', value: 'recordDate' },
+                    { text: '录入日期', value: 'record_date' },
                     { text: '操作', value: 'actions', sortable: false },
                 ],
                 desserts: [],
@@ -262,11 +316,10 @@
                     sortDesc:[false],
                     page:1,
                     itemsPerPage:3,
-                    multiSort: false,
                     mustSort: true,
-                    groupBy: [],
-                    groupDesc:[],
                 },
+                roleList:[],
+                selectedRoles:[]
             },
             created () {
                 //this.initialize()
@@ -275,72 +328,135 @@
 
             },
             methods:{
-                options1(options){
-                    console.log(options)
-                },
                 initialize(){
                     this.loading = true
 
                     const { sortBy, sortDesc, page, itemsPerPage } = this.options
 
                     let params ={
-                        index : page,
+                        pageIndex : page,
+                        pageSize : 3,//itemsPerPage
+                        sortColumn : sortBy[0],
+                        sortMethod : sortDesc[0]?'desc':'asc',
+                        ...this.search
                     }
-                    params[sortDesc[0]?'desc':'asc'] = sortBy[0]
-                    axios.get('/api/user?', {
+
+                    axios.get('/api/user/?', {
                         params
                     }).then((res) => {
                         this.desserts = res.data.data.rows;
-                        this.totalDesserts = res.data.data.totalRecords
-                        console.log(res.data.data.rows);
+                        this.totalDesserts = res.data.data.total_records
+                        //console.log(res.data.data.rows);
                         this.loading = false
                     })
                 },
-                editItem (item) {
-                    this.editedIndex = this.desserts.indexOf(item)
-                    this.editedItem = Object.assign({}, item)
-                    this.dialog = true
+                openAdd(){
+                    this.dialogEdit = true
+                    this.getRoleList()
+                },
+                openEdit (item,index) {
+                    this.editedIndex = index
+                    this.getRoleList()
+                    axios.get('/api/user/'+item.id).then((res) => {
+                        console.log(res.data)
+                        this.editedItem = res.data.data
+
+                        this.selectedRoles = this.editedItem.roles
+
+
+                    })
+
+                    this.dialogEdit = true
+                },
+                closeEdit(){
+                    this.dialogEdit = false
+                    this.editedItem = this.emptyItem
+                    this.selectedRoles = []
+                    this.editedIndex = -1
+                },
+                save () {
+                    let sysUserRoleList = []
+                    const userId = this.editedItem.id
+                    this.selectedRoles.forEach(function (item) {
+
+                        sysUserRoleList.push({
+                            user_id : userId,
+                            role_id : item.id
+                        })
+                    })
+
+                    /*let formData = new URLSearchParams()
+
+                    for (const [key, value] of Object.entries(this.editedItem)) {
+                        formData.append(`sysUser[${key}]`,value)
+                    }
+                    this.selectedRoles.forEach(function (item,i) {
+                        formData.append(`sys_user_role_list[${i}][user_id]`,userId)
+                        formData.append(`sys_user_role_list[${i}][role_id]`,item.id)
+                    })*/
+
+
+                    axios.post('/api/user/save',{
+                            sys_user:this.editedItem,
+                            sys_user_role_list:sysUserRoleList
+                        }).then((res) => {
+                        if (this.editedIndex>-1){
+                            Vue.set(this.desserts,this.editedIndex,this.editedItem)
+                        }
+                        else{
+                            this.desserts.push(this.editedItem)
+                        }
+                        this.initialize()
+                        this.closeEdit()
+
+                    })
+
+
                 },
 
-                deleteItem (item) {
-                    this.editedIndex = this.desserts.indexOf(item)
-                    this.editedItem = Object.assign({}, item)
+                openBatchDel(item){
+                    if (item)
+                    {
+                        this.selected = [item]
+                    }
                     this.dialogDelete = true
                 },
-
-                deleteItemConfirm () {
-                    this.desserts.splice(this.editedIndex, 1)
-                    this.closeDelete()
-                },
-
-                close () {
-                    this.dialog = false
-                    this.$nextTick(() => {
-                        this.editedItem = Object.assign({}, this.defaultItem)
-                        this.editedIndex = -1
+                del(){
+                    console.log(this.selected)
+                    let ids = this.selected.map(item=>item.id)
+                    console.log(ids)
+                    axios.delete('/api/user/'+ids.join(',')).then((res)=>{
+                        this.selected.forEach((item) => {
+                            this.desserts.splice(this.desserts.indexOf(item),1)
+                        })
+                        this.selected=[]
+                        this.dialogDelete=false
                     })
                 },
-
-                closeDelete () {
-                    this.dialogDelete = false
-                    this.$nextTick(() => {
-                        this.editedItem = Object.assign({}, this.defaultItem)
-                        this.editedIndex = -1
-                    })
+                closeDel(){
+                    this.dialogDelete=false
                 },
-
-                save () {
-                    if (this.editedIndex > -1) {
-                        Object.assign(this.desserts[this.editedIndex], this.editedItem)
-                    } else {
-                        this.desserts.push(this.editedItem)
-                    }
-                    this.close()
+                getRoleList(){
+                   axios.get('/api/role',{
+                       params: {
+                           index:1,
+                           size:999,
+                           asc:'name'
+                       }
+                   }).then((res)=>{
+                       this.roleList = res.data.data.rows;
+                   })
                 },
+                statusText(status){
+                    return status==0?'未锁定':'锁定'
+                },
+                statusColor(status) {
+                    return  status==0?'success':'error'
+                }
             },
             computed:{
                 formTitle () {
-                    return this.editedIndex === -1 ? '新增' : '修改'
+                    return this.editedIndex === -1 ? '新增用户' : '修改用户'
                 },
             },
             watch: {
@@ -348,19 +464,13 @@
                 question: function (newQuestion, oldQuestion) {
 
                 },
-                dialog (val) {
-                    val || this.close()
+                options: {
+                    handler (val, oldVal) {
+                        //console.log(val,oldVal)
+                        this.initialize()
+                    },
+                    deep: true,
                 },
-                dialogDelete (val) {
-                    val || this.closeDelete()
-                },
-                // options: {
-                //     handler (val, oldVal) {
-                //         console.log(val,oldVal)
-                //         this.initialize()
-                //     },
-                //     deep: true,
-                // },
             },
         })
     </script>

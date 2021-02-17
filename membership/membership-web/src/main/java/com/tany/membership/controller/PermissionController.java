@@ -1,5 +1,7 @@
 package com.tany.membership.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -25,6 +28,50 @@ public class PermissionController {
     private ISysPermissionService permissionService;
     @Autowired
     private ISysPermissionRelationService relationService;
+
+    @GetMapping
+    public JSONResult getPermission()
+    {
+        JSONResult jsonResult = new JSONResult();
+
+        jsonResult.setStatus(HttpStatus.OK);
+        jsonResult.setData(permissionService.getPermissionList());
+        return jsonResult;
+    }
+
+    @PostMapping
+    public JSONResult savePermission(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
+                                     @RequestBody SysPermission sysPermission)
+    {
+        JSONResult jsonResult = new JSONResult();
+
+        if (permissionService.saveOrUpdate(sysPermission)) {
+            jsonResult.setStatus(HttpStatus.OK);
+            jsonResult.setMsg("保存成功！");
+        } else {
+            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            jsonResult.setMsg("保存失败！");
+        }
+
+        return jsonResult;
+    }
+
+    @DeleteMapping
+    public JSONResult delPermission(SysPermission permission){
+        JSONResult jsonResult = new JSONResult();
+
+        permission.setDeleted(1);
+        permission.setDeletedDate(new Date());
+        if (permissionService.save(permission)) {
+            jsonResult.setStatus(HttpStatus.OK);
+            jsonResult.setMsg("删除成功！");
+        } else {
+            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            jsonResult.setMsg("删除失败！");
+        }
+
+        return jsonResult;
+    }
 
     @GetMapping("/byRole")
     public JSONResult getPermissionByRole(Long roleId)
@@ -62,21 +109,7 @@ public class PermissionController {
         return jsonResult;
     }
 
-    @PostMapping("/save")
-    public JSONResult savePermission(@RequestParam(Constant.CURUSER_ID) Long curUserId, List<SysPermission> list)
-    {
-        JSONResult jsonResult = new JSONResult();
 
-        if (permissionService.saveBatch(list)) {
-            jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setMsg("保存成功！");
-        } else {
-            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            jsonResult.setMsg("保存失败！");
-        }
-
-        return jsonResult;
-    }
 
     @GetMapping("/getmenusbyuser")
     public JSONResult getMenuByUser(@RequestParam(Constant.CURUSER_ID) Long curUserId)

@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.tany.membership.entity.SysUser;
 import com.tany.membership.vo.UserWithRole;
 import org.apache.ibatis.annotations.Param;
+import com.tany.membership.common.MyPage;
+
+import java.util.List;
 
 /**
  * <p>
@@ -17,4 +20,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
     IPage<UserWithRole> getUserList(IPage<UserWithRole> page, @Param("ew") Wrapper<UserWithRole> queryWrapper);
+
+    List<UserWithRole> getUserList3(MyPage page, @Param("ew") Wrapper<UserWithRole> queryWrapper);
 }

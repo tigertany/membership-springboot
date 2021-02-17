@@ -8,12 +8,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
+import com.tany.membership.common.MyPage;
 import com.tany.membership.common.PagedResult;
+import com.tany.membership.dto.SaveUserAndRoles;
+import com.tany.membership.entity.SysRole;
 import com.tany.membership.entity.SysUser;
 import com.tany.membership.entity.SysUserRole;
 import com.tany.membership.service.ISysUserRoleService;
 import com.tany.membership.service.ISysUserService;
 import com.tany.membership.vo.UserWithRole;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @Anonymous
@@ -38,29 +40,27 @@ public class UserController {
     private ISysUserRoleService userRoleService;
 
     @GetMapping
-    public JSONResult getUserList(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,
-                              @RequestParam(value = "index",required = false) Long pageIndex,
-                              @RequestParam(value = "search",required = false) String search,
-                              @RequestParam(value = "asc",required = false) String orderAsc,
-                              @RequestParam(value = "desc",required = false) String orderDesc)
+    public JSONResult getUserList(@RequestParam(value = "pageIndex",required = false) long pageIndex,
+                                  @RequestParam(value = "pageSize",required = false) long pageSize,
+                              @RequestParam(value = "sortColumn",required = false) String sortColumn,
+                              @RequestParam(value = "sortMethod",required = false) String sortMethod,
+                              @RequestParam(required = false) LinkedHashMap<String,Object> search)
     {
-
-        if (pageIndex==null || pageIndex==0) {
-            pageIndex =1l;
-        }
-
-
+        return JSONResult.ok(userService.query(pageIndex,pageSize,sortColumn,sortMethod,search));
+    /*
         Page<UserWithRole> page = new Page<>(pageIndex,3); //查询第一页，查询1条数据
-
+        //page.setSearchCount(false);
 
         QueryWrapper<UserWithRole> wrapper = new QueryWrapper<>();
-
         //设置查询条件
-        if (StringUtils.isNotBlank(search)) {
-            wrapper.like("account",search);
+        for (Map.Entry<String, Object> entry : search.entrySet()) {
+
+            if (staticParams.contains(entry.getKey())) continue;
+            wrapper.like(entry.getKey(),entry.getValue());
         }
 
-        wrapper.like("roles_name","员");
+
+        //wrapper.like("roles_name","员");
         wrapper.eq("deleted",0);
 
         if (StringUtils.isNotBlank(orderAsc))
@@ -74,6 +74,8 @@ public class UserController {
 
 
         IPage<UserWithRole> iPage = userService.getUserList(page, wrapper); //userService.page(page, wrapper);
+*/
+//        iPage.setTotal(count);
 //        System.out.println("数据总条数： " + iPage.getTotal());
 //        System.out.println("数据总页数： " + iPage.getPages());
 //        System.out.println("当前页数： " + iPage.getCurrent());
@@ -85,21 +87,15 @@ public class UserController {
 //            newList.add(CommonUtils.entityMapping(SIMPLE_BUSS_INFO.class, originObj));
 //        }
 
-        PagedResult pagedResult = new PagedResult();
-        pagedResult.setTotalPage(iPage.getPages());
-        pagedResult.setTotalRecords(iPage.getTotal());
-        pagedResult.setCurrentPage(iPage.getCurrent());
-        pagedResult.setRows(iPage.getRecords());
 
 
-        return JSONResult.ok(pagedResult);
     }
 
     @GetMapping("/{id}")
-    public JSONResult getUser(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable String id)
+    public JSONResult getUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable long id)
     {
         JSONResult jsonResult = new JSONResult();
-
+/*
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
 
 
@@ -108,11 +104,13 @@ public class UserController {
         //queryWrapper.eq("CREATER_ID", userId);
 
         SysUser entity = userService.getOne(queryWrapper,false);
+*/
 
-        if(entity!=null)
+        UserWithRole userWithRole = userService.queryById(id);
+        if(userWithRole!=null)
         {
             jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setData(entity);
+            jsonResult.setData(userWithRole);
             return jsonResult;
         }
         else
@@ -122,23 +120,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable Integer[] ids)
+    public JSONResult delUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
-        List<SysUser> list = new ArrayList<>();
-        for (int i = 0; i < ids.length; i++)
-        {
-            SysUser user = new SysUser();
-            user.setId(ids[i]);
-            user.setDeleted(1);
-            user.setDeletedDate(new Date());
-            list.add(user);
-        }
-
-
-
-        if(userService.updateBatchById(list))
+        if(userService.delete(curUserId,ids))
         {
             jsonResult.setStatus(HttpStatus.OK);
             jsonResult.setMsg("删除成功!");
@@ -150,32 +136,20 @@ public class UserController {
         }
     }
 
-    @PostMapping("/save")
-    public JSONResult save(@RequestParam(Constant.CURUSER_ID) String curUserId,@Validated @RequestBody SysUser user) {
+    @PostMapping("/save")//@RequestBody SaveUserAndRoles saveUserAndRoles
+    public JSONResult save(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
+                           @RequestBody SaveUserAndRoles saveUserAndRoles) {
         JSONResult jsonResult = new JSONResult();
-        //logger.info(user.toString());
+        //logger.info(saveUserAndRoles.toString());
 
+        if (userService.save(curUserId,saveUserAndRoles)) {
+            jsonResult.setStatus(HttpStatus.OK);
+            jsonResult.setMsg("保存成功！");
 
-
-        if (user.getId()==null || user.getId()==0) {
-            jsonResult.setMsg("保存失败，未传递主键！");
-
+        } else {
+            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            jsonResult.setMsg("保存失败！");
         }
-        else
-        {
-            user.setRecordDate(new Date());
-            user.setRecorder(curUserId);
-            if (userService.saveOrUpdate(user)) {
-                jsonResult.setStatus(HttpStatus.OK);
-                jsonResult.setMsg("保存成功！");
-                System.out.println(user.getId());
-            } else {
-                jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-                jsonResult.setMsg("保存失败！");
-            }
-
-        }
-
         return jsonResult;
 
     }

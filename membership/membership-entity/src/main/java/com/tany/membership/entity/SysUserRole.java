@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author tany
@@ -13,6 +13,9 @@ import java.io.Serializable;
 public class SysUserRole implements Serializable {
 
     private static final long serialVersionUID=1L;
+
+    public SysUserRole() {
+    }
 
     private Integer userId;
 

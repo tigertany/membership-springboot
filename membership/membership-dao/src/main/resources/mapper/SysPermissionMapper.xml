@@ -2,7 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tany.membership.dao.SysPermissionMapper">
 
-    <select id="selectPermissionByRole" resultType="com.tany.membership.vo.PermissionWithChecked" parameterType="java.lang.Long">
+    <resultMap id="selectPermissionResult" type="PermissionWithChecked" >
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="parent_id" property="parentId" />
+        <result column="path" property="path" />
+        <result column="url" property="url" />
+        <result column="words" property="words" />
+        <result column="icon" property="icon" />
+        <result column="sort" property="sort" />
+        <result column="status" property="status" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_date" property="deletedDate" />
+        <collection property="children" column="id" select="getPermissionList" ofType="PermissionWithChecked"></collection>
+    </resultMap>
+    <select id="getPermissionList" resultMap="selectPermissionResult">
+      SELECT *
+      FROM sys_permission
+      where deleted=0 and parent_id=#{permissionId}
+      order by id
+    </select>
+
+    <resultMap id="selectPermissionByRoleResult" type="PermissionWithChecked" >
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="parent_id" property="parentId" />
+        <collection property="children" column="{roleId=role_id,permissionId=id}" select="selectPermissionByRole" ofType="PermissionWithChecked"></collection>
+    </resultMap>
+    <select id="selectPermissionByRole" resultMap="selectPermissionByRoleResult">
       SELECT case when D.permission_id is null then false else true end checked,
         A.id,
         A.name,
@@ -30,9 +58,16 @@
       WHERE
           C.id = #{roleId}
       ) D ON A.id = D.permission_id
-    </select>
 
-    <select id="selectPermissionByUser" resultType="com.tany.membership.entity.SysPermission" parameterType="java.lang.Long">
+      where A.parent_id=#{permissionId}
+
+      order by A.id
+    </select>
+    <sql id="params_role_id">
+        #{roleId}
+    </sql>
+
+    <select id="selectPermissionByUser" resultType="PermissionWithChecked" parameterType="java.lang.Long">
       SELECT A.* FROM sys_permission A
 	  INNER JOIN (
 	    SELECT

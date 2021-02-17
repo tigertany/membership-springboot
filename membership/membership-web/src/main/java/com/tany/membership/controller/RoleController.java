@@ -1,5 +1,6 @@
 package com.tany.membership.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -8,10 +9,14 @@ import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
 import com.tany.membership.common.PagedResult;
+import com.tany.membership.entity.SysPermissionRelation;
 import com.tany.membership.entity.SysRole;
 import com.tany.membership.entity.SysUserRole;
+import com.tany.membership.service.ISysPermissionRelationService;
+import com.tany.membership.service.ISysPermissionService;
 import com.tany.membership.service.ISysRoleService;
 import com.tany.membership.service.ISysUserRoleService;
+import com.tany.membership.vo.PermissionWithChecked;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @Anonymous
@@ -34,39 +37,43 @@ public class RoleController {
     private ISysRoleService roleService;
     @Autowired
     private ISysUserRoleService userRoleService;
+    @Autowired
+    private ISysPermissionService permissionService;
+    @Autowired
+    private ISysPermissionRelationService permissionRelationService;
 
-    @GetMapping("/")
-    public JSONResult getRoleList(@PathParam("index") Long pageIndex,
-                                  @PathParam("search") String search,
-                                  @PathParam("asc") String orderAsc,
-                                  @PathParam("desc") String orderDesc)
+    @GetMapping
+    public JSONResult getRoleList(@RequestParam(value = "pageIndex",required = false) long pageIndex,
+                                  @RequestParam(value = "pageSize",required = false) long pageSize,
+                                  @RequestParam(value = "sortColumn",required = false) String sortColumn,
+                                  @RequestParam(value = "sortMethod",required = false) String sortMethod,
+                                  @RequestParam(required = false) LinkedHashMap<String,Object> search)
     {
-
-        if (pageIndex==null || pageIndex==0) {
-            pageIndex =1l;
-        }
+        List<String> staticParams = Arrays.asList("pageIndex","pageSize","sortColumn","sortMethod");
 
 
-        Page<SysRole> page = new Page<>(pageIndex,3); //查询第一页，查询1条数据
+        Page<SysRole> page = new Page<>(pageIndex,pageSize); //查询第一页，查询1条数据
 
 
         QueryWrapper<SysRole> wrapper = new QueryWrapper<>();
 
         //设置查询条件
-        if (StringUtils.isNotBlank(search)) {
-            wrapper.like("name",search);
+        for (Map.Entry<String, Object> entry : search.entrySet()) {
+
+            if (staticParams.contains(entry.getKey())) continue;
+            wrapper.like(entry.getKey(),entry.getValue());
         }
 
 
         wrapper.eq("deleted",0);
 
-        if (StringUtils.isNotBlank(orderAsc))
+        if ("asc".equalsIgnoreCase(sortMethod))
         {
-            page.addOrder(OrderItem.asc(orderAsc));
+            page.addOrder(OrderItem.asc(sortColumn));
         }
-        if (StringUtils.isNotBlank(orderDesc))
+        if ("desc".equalsIgnoreCase(sortMethod))
         {
-            page.addOrder(OrderItem.desc(orderDesc));
+            page.addOrder(OrderItem.desc(sortColumn));
         }
 
 
@@ -93,7 +100,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
-    public JSONResult getRole(@PathVariable String id)
+    public JSONResult getRole(@PathVariable("id") String id)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -118,8 +125,8 @@ public class RoleController {
         }
 
     }
-    @GetMapping("/delete/{ids}")
-    public JSONResult delRole(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable Integer[] ids)
+    @DeleteMapping("/{ids}")
+    public JSONResult delRole(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable("ids") Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -144,31 +151,26 @@ public class RoleController {
             return JSONResult.error("删除失败！");
         }
     }
-    @PostMapping("save")
-    public JSONResult save(@RequestParam(Constant.CURUSER_ID) String curUserId,
+    @PostMapping
+    public JSONResult save(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
                            @Validated @RequestBody SysRole role)
     {
         JSONResult jsonResult = new JSONResult();
-        //logger.info(user.toString());
+        //logger.info(role.toString());
 
-        if (role.getId()==null || role.getId()==0) {
-            jsonResult.setMsg("保存失败，未传递主键！");
 
+        role.setRecordDate(new Date());
+        role.setRecorder(curUserId);
+        if (roleService.saveOrUpdate(role)) {
+            jsonResult.setStatus(HttpStatus.OK);
+            jsonResult.setMsg("保存成功！");
+
+        } else {
+            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            jsonResult.setMsg("保存失败！");
         }
-        else
-        {
-            role.setRecordDate(new Date());
-            role.setRecorder(curUserId);
-            if (roleService.saveOrUpdate(role)) {
-                jsonResult.setStatus(HttpStatus.OK);
-                jsonResult.setMsg("保存成功！");
-                System.out.println(role.getId());
-            } else {
-                jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-                jsonResult.setMsg("保存失败！");
-            }
 
-        }
+
 
         return jsonResult;
 
@@ -190,5 +192,42 @@ public class RoleController {
 
 
         return jsonResult;
+    }
+    @PostMapping("setPermission")
+    public JSONResult setPermission(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@RequestBody ArrayList<SysPermissionRelation> sysPermissionRelations)
+    {
+        JSONResult jsonResult = new JSONResult();
+
+        if (sysPermissionRelations!=null&&sysPermissionRelations.size()>0)
+        {
+            QueryWrapper<SysPermissionRelation> wrapper = new QueryWrapper<>();
+            wrapper.eq("type",1);
+            wrapper.eq("share_id",sysPermissionRelations.get(0).getShareId());
+            permissionRelationService.remove(wrapper);
+
+            if (permissionRelationService.saveBatch(sysPermissionRelations)) {
+                jsonResult.setStatus(HttpStatus.OK);
+                jsonResult.setMsg("保存成功！");
+            } else {
+                jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+                jsonResult.setMsg("保存失败！");
+            }
+        }
+
+        return jsonResult;
+
+    }
+    @GetMapping("/{id}/permission")
+    public JSONResult getPermissionByRole(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable("id") long roleId)
+    {
+        JSONResult jsonResult = new JSONResult();
+        List<PermissionWithChecked> list = permissionService.getPermissionByRole(roleId);
+
+        jsonResult.setStatus(HttpStatus.OK);
+        jsonResult.setData(list);
+        return jsonResult;
+
+
+
     }
 }

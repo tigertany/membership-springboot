@@ -1,10 +1,11 @@
 package com.tany.membership.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author tany
@@ -49,6 +50,9 @@ public class SysPermission implements Serializable {
      */
     private Integer status;
 
+    private Integer deleted;
+
+    private Date deletedDate;
 
     public Integer getId() {
         return id;
@@ -128,6 +132,22 @@ public class SysPermission implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
+    }
+
+    public Date getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(Date deletedDate) {
+        this.deletedDate = deletedDate;
     }
 
     @Override

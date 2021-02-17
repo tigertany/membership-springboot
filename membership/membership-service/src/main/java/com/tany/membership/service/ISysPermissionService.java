@@ -26,4 +26,6 @@ public interface ISysPermissionService extends IService<SysPermission> {
     List<SysPermission> getPermissionByUser(Long userId);
 
     List<Menu> getMenusByUser(Long userId);
+
+    List<PermissionWithChecked> getPermissionList();
 }

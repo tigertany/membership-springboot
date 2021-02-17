@@ -6,11 +6,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <link href="/static/icon/css/materialdesignicons.css" rel="stylesheet" />
     <link href="/static/vuetify/vuetify.css" rel="stylesheet" />
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-cloak>
     <v-app>
+        <v-main class="py-4 px-2">
+            <v-container fluid>
+                <v-row>
+                    <v-col cols="3" style="overflow-y:auto;height: 530px">
+                            <v-treeview
+                                :active.sync="currentItems"
+                                :items="list"
+                                activatable
+                                hoverable
+                                :color="theme"
+                                transition
+                                dense
+                                return-object
+                                ref="tv"
+                            >
+                                <template v-slot:prepend="{ item, open }">
+                                    <v-icon>
+                                        {{ item.icon }}
+                                    </v-icon>
+                                </template>
+                            </v-treeview>
+                    </v-col >
+                    <v-divider vertical></v-divider>
+                    <v-col>
+                        <v-scroll-y-transition mode="out-in">
+                            <div v-if="currentItems.length==0 || currentItems[0].name=='ROOT'"
+                                class="title deep-purple--text text--accent-4 font-weight-light"
+                            >
+                                选择一个权限
+                            </div>
+                            <v-card v-else
+                                    :key="currentItems[0].id"
+                                    max-width="400"
+                            >
+                                <v-card-text>
+                                <v-row>
+                                    <v-col cols="10" offset="1">
+                                        <v-text-field v-model="currentItems[0].name"
+                                                      label="权限名称"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-select
+                                                :items="permTypes"
+                                                label="权限类型"
+                                                dense
+                                                v-model="currentItems[0].type"
+                                        ></v-select>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-select
+                                                :items="permissions"
+                                                label="父权限"
+                                                dense
+                                                v-model="currentItems[0].parent_id"
+                                                @input="changePath"
+                                                return-object
+                                        >
+                                            <template v-slot:item="{item}" >
+                                                <v-list-item-content>
+                                                    <v-list-item-title v-html="item.text">
+                                                    </v-list-item-title>
+                                                </v-list-item-content>
+                                            </template>
+                                            <template v-slot:selection="{item}" >
+                                                    <span v-html="item.text.replace(/&nbsp;/g,'')"></span>
+                                            </template>
+                                        </v-select>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-text-field v-model="currentItems[0].path"
+                                                      label="路径"
+                                                      readonly
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-text-field v-model="currentItems[0].url"
+                                                      label="URL"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-text-field v-model="currentItems[0].sort"
+                                                      label="排序"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="10" offset="1">
+                                        <v-text-field v-model="currentItems[0].icon"
+                                                      label="图标"
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                    <v-btn color="info"
+                                        dark
+                                        @click="addPermission"
+                                    >
+                                        新增
+                                    </v-btn>
+                                    <v-btn color="primary"
+                                        dark
+                                        @click="savePermission"
+                                    >
+                                        保存
+                                    </v-btn>
+                                    <v-btn color="error"
+                                        dark
+                                        @click="delPermission"
+                                    >
+                                        删除
+                                    </v-btn>
 
+                                </v-card-actions>
+                            </v-card>
+                        </v-scroll-y-transition>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-main>
     </v-app>
 </div>
 <script src="/static/js/vue.js"></script>
@@ -21,11 +145,126 @@
     new Vue({
         el: '#app',
         vuetify: new Vuetify(),
-        data: {},
+        data: {
+            theme:'deep-purple accent-4',
+            currentItems:[],
+            list:[],
+            active: [],
+            open: [],
+            permTypes:[{text:'菜单',value:"1"}, {text:'按钮',value:"2"},{text:'其他',value:"3"}],
+            permissions:[],
+            rootMenu:{
+                id:0,
+                name:'ROOT',
+                parent_id:-1,
+                icon :'mdi-database',
+                children:[]
+            }
+        },
         mounted() {
 
         },
-        methods: {},
+        created () {
+            this.getList()
+        },
+        methods: {
+            buildPerms(data,layer){
+                data.forEach((item)=>{
+                    let perm = {value:item.id,path:item.path,text:''}
+
+                    for (let i = 1; i < layer; i++) {
+                        perm.text +='&nbsp;&nbsp;'
+                    }
+                    perm.text+=item.name
+
+                    if (item.children.length>0){
+                        //perm.header=item.name+'->'
+                        //perm.divider=true
+
+                        this.permissions.push(perm)
+
+                        this.buildPerms(item.children,layer+1)
+                    }
+                    else{
+                        this.permissions.push(perm)
+                    }
+
+
+
+                })
+            },
+
+            changePath(selectedItem){
+                //console.log(selectedItem)
+
+                Vue.set(this.currentItems[0],'path',selectedItem.text=='ROOT'?'0':selectedItem.path+'/'+selectedItem.value)
+            },
+            getList(){
+                axios.get('/api/permission').then(({data})=>{
+                    console.log(data.data)
+
+
+
+
+                    this.rootMenu.children = data.data
+                    this.list = [this.rootMenu]
+                    this.buildPerms(this.list,1)
+                    console.log(this.$refs.tv)
+                    this.$nextTick(()=>{
+                        this.$refs.tv.updateAll(true)
+                    })
+
+                })
+            },
+            addPermission(){
+                //this.currentItems.splice(0)
+                const empty = {
+                    icon: '',
+                    id: -1,
+                    name: '',
+                    parent_id: 0,
+                    path: '0',
+                    sort: 0,
+                    type: '1',
+                    words: ''
+                }
+                this.list.push(empty)
+                Vue.set(this.currentItems,0,empty)
+            },
+            savePermission(){
+                const permission = Object.assign({},this.currentItems[0])
+                permission.parent_id = this.currentItems[0].parent_id.value
+                axios.post('/api/permission',permission).then(({data})=>{
+                    console.log(data)
+                })
+            },
+            findAndDel(list,id){
+                if (list && list.length>0){
+                    list.forEach((item,i)=>{
+                        if (id==item.id){
+                            console.log(list.splice(i,1))
+                        }
+                        else{
+                            this.findAndDel(item.children,id)
+                        }
+                    })
+                }
+
+            },
+            delPermission(){
+                const id = this.currentItems[0].id
+                this.findAndDel(this.list,id)
+
+                if (id!=-1){
+                    axios.delete('/api/permission',{
+                        ...this.currentItems[0]
+                    }).then(({data})=>{
+                        console.log(data.data)
+                    })
+                }
+
+            }
+        },
         computed: {},
         watch: {
             // 如果 `question` 发生改变，这个函数就会运行

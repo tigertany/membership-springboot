@@ -6,32 +6,447 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <link href="/static/icon/css/materialdesignicons.css" rel="stylesheet" />
     <link href="/static/vuetify/vuetify.css" rel="stylesheet" />
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-cloak>
     <v-app>
+        <v-main class="py-4 px-2">
+            <v-card>
+                <v-container fluid >
+                    <v-row>
+                        <v-col
+                                cols="1"
+                        >
+                            <v-text-field
+                                    label="按角色名搜索"
+                                    color="deep-purple accent-4"
+                                    clearable
+                                    dense
+                                    v-model="search.name"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col
+                                cols="1"
+                        >
+                            <v-text-field
+                                    label="按角色代码搜索"
+                                    color="deep-purple accent-4"
+                                    clearable
+                                    dense
+                                    v-model="search.code"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card>
+            <br>
+            <v-card>
+                <v-container fluid >
+                    <v-row no-gutters>
+                        <v-col cols="12" class="text-right">
+                            <v-btn color="info" @click="openAdd" >新增</v-btn>
+                            <v-btn color="success" @click="query" >查询</v-btn>
+                            <v-btn color="error" @click="openBatchDel(null)" >删除</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card>
+            <br>
 
+
+            <v-data-table
+                    :headers="headers"
+                    :items="list"
+                    :items-per-page="3"
+                    :options.sync="options"
+                    item-key="id"
+                    class="elevation-1"
+                    :loading="loading"
+                    v-model="selectedItems"
+                    :server-items-length="rowCount"
+                    show-select
+                    must-sort
+                    :footer-props="{itemsPerPageOptions:[1,3,5,10]}"
+            >
+                <template v-slot:item.name="{ item }">
+                    <span v-if="!item.edit" v-text="item.name"></span>
+
+                    <v-text-field
+                            v-else
+                            v-model="item.name"
+                    ></v-text-field>
+
+                </template>
+                <template v-slot:item.code="{ item }">
+                    <span v-if="!item.edit" v-text="item.code"></span>
+
+                    <v-text-field
+                            v-else
+                            v-model="item.code"
+                    ></v-text-field>
+
+                </template>
+                <template v-slot:item.description="{ item }">
+                    <span v-if="!item.edit" v-text="item.description"></span>
+
+                    <v-text-field
+                            v-else
+                            v-model="item.description"
+                    ></v-text-field>
+
+                </template>
+                <template v-slot:item.status="{ item }">
+
+                    <template v-if="!item.edit">
+                        <v-chip :color="statusColor(item.status)"
+                                dark
+                        >
+                            {{ statusText(item.status) }}
+                        </v-chip>
+                    </template>
+                    <template v-else>
+                        <v-switch
+                                v-model="item.status"
+                                hint="启用/禁用"
+                                :true-value="1"
+                                :false-value="0"
+                        ></v-switch>
+                    </template>
+
+
+                </template>
+
+
+                <template v-slot:item.actions="{ item ,index}">
+                    <v-icon v-if="!item.edit" @click="openEdit(item,index)"
+                    >
+                        mdi-pencil
+                    </v-icon>
+                    <template v-else>
+                        <v-icon @click="save(item,index)"
+                        >
+                            mdi-content-save
+                        </v-icon>
+                        <v-icon @click="closeEdit(item,index)"
+                        >
+                            mdi-cancel
+                        </v-icon>
+                    </template>
+
+
+
+                    <v-icon @click="openBatchDel(item)"
+                    >
+                        mdi-delete
+                    </v-icon>
+                    <v-icon @click="openPermission(item)"
+                    >
+                        mdi-account-lock
+                    </v-icon>
+                </template>
+                <template v-slot:no-data>
+                    <v-btn
+                            color="primary"
+                            @click="query"
+                    >
+                        重置
+                    </v-btn>
+                </template>
+
+            </v-data-table>
+
+            <v-dialog v-model="dialogPermission"
+                      persistent
+                      max-width="400px"
+                      scrollable
+                >
+                <v-card>
+                    <v-card-title>{{curRoleName}}</v-card-title>
+                    <v-divider></v-divider>
+                    <v-card-text>
+                        <v-container>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-treeview
+                                            selectable
+                                            open-all
+                                            :items="permissionList"
+                                            v-model="selectedPermissions"
+                                            :selected-color="theme"
+                                            return-object
+                                    ></v-treeview>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                                :color="theme"
+                                dark
+                                @click="savePermission"
+                        >
+                            保存
+                        </v-btn>
+                        <v-btn
+                                :color="theme"
+                                text
+                                dark
+                                @click="closePermission"
+                        >
+                            取消
+                        </v-btn>
+
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
+            <v-dialog v-model="dialogDelete" max-width="500px" hide-overlay persistent>
+                <v-card>
+                    <v-card-title class="headline">确认要删除吗?</v-card-title>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn :color="theme" dark @click="del">OK</v-btn>
+                        <v-btn :color="theme" text @click="closeDel">Cancel</v-btn>
+                        <v-spacer></v-spacer>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+            </v-container>
+        </v-main>
     </v-app>
 </div>
 <script src="/static/js/vue.js"></script>
 <script src="/static/js/vue-router.js"></script>
 <script src="/static/vuetify/vuetify.js"></script>
 <script src="/static/axios/axios.js"></script>
+<script src="/static/axios/qs.js"></script>
 <script>
     new Vue({
         el: '#app',
         vuetify: new Vuetify(),
-        data: {},
+        data:{
+            theme:'deep-purple accent-4',
+            loading : false,
+            dialogEdit: false,
+            dialogDelete : false,
+            editedIndex: -1,
+            editedItem: {
+                id:0,
+                name: '',
+                code: '',
+                status: 0,
+                description:'',
+                recorder: '',
+                record_date: '',
+            },
+            emptyItem: {
+                id:0,
+                name: '',
+                code: '',
+                status: 0,
+                description:'',
+                recorder: '',
+                record_date: '',
+            },
+            selectedItems: [],
+            delIds:[],
+            search:{},
+            headers: [
+                { text: '角色名称', value: 'name' },
+                { text: '角色代码', value: 'code' },
+                { text: '描述', value: 'description'},
+                { text: '状态', value: 'status' },
+                { text: '录入人', value: 'recorder' },
+                { text: '录入日期', value: 'record_date' },
+                { text: '操作', value: 'actions', sortable: false },
+            ],
+            list: [],
+            rowCount:-1,
+            options: {
+                sortBy :['id'],
+                sortDesc:[false],
+                page:1,
+                itemsPerPage:3,
+                mustSort: true,
+            },
+            dialogPermission: false,
+            permissionList:[],
+            selectedPermissions:[]
+        },
         mounted() {
 
         },
-        methods: {},
-        computed: {},
-        watch: {
-            // 如果 `question` 发生改变，这个函数就会运行
-            question: function (newQuestion, oldQuestion) {
+        methods: {
+            query(){
+                this.loading = true
 
+                const { sortBy, sortDesc, page, itemsPerPage } = this.options
+
+                let params ={
+                    pageIndex : page,
+                    pageSize : 3,//itemsPerPage
+                    sortColumn : sortBy[0],
+                    sortMethod : sortDesc[0]?'desc':'asc',
+                    ...this.search
+                }
+
+                axios.get('/api/role/?', {
+                    params
+                },{
+                    data:this.search
+                }).then((res) => {
+                    const {rows,total_records} = res.data.data
+                    this.list = rows
+                    this.rowCount = total_records
+                    //console.log(res.data.data.rows);
+                    this.loading = false
+                })
+            },
+            openAdd(){
+                this.emptyItem.edit = true
+                this.list.push(this.emptyItem)
+
+            },
+            openEdit (item,index) {
+                //this.editedIndex = index
+                Vue.set(this.list[index],'edit',true)
+
+                //this.editedItem = item
+                // axios.get('/api/role/'+item.id).then((res) => {
+                //     console.log(res.data)
+                //     this.editedItem = res.data.data
+                //
+                // })
+
+                //this.dialogEdit = true
+            },
+            closeEdit(item,index){
+
+                Vue.set(this.list[index],'edit',false)
+
+                //this.dialogEdit = false
+                //this.editedItem = this.emptyItem
+                //this.editedIndex = -1
+            },
+            save (item,index) {
+
+                axios.post('/api/role',item).then((res) => {
+                    this.query()
+                    this.closeEdit(item,index)
+
+                })
+
+
+            },
+
+            openBatchDel(item){
+                if (item)
+                {
+                    this.selectedItems = [item]
+                }
+                this.dialogDelete = true
+            },
+            del(){
+
+                let ids = this.selectedItems.map(item=>item.id)
+                console.log(ids)
+                axios.delete('/api/role/'+ids.join(',')).then((res)=>{
+                    this.selectedItems.forEach((item) => {
+                        this.list.splice(this.list.indexOf(item),1)
+                    })
+                    this.selectedItems.splice(0)
+                    this.dialogDelete=false
+                })
+            },
+            closeDel(){
+                this.dialogDelete=false
+            },
+            statusText(status){
+                return status==0?'异常':'正常'
+            },
+            statusColor(status) {
+                return  status==0?'error':'success'
+            },
+            getSelectedPermissions(arr){
+                arr.forEach((item)=>{
+                    if (item.children.length>0){
+                        this.getSelectedPermissions(item.children)
+                    }
+                    else {
+                        if (item.checked)
+                            this.selectedPermissions.push(item)
+                    }
+                })
+            },
+            getParentPermissions(path,permissionRelation,roleId){
+
+                const parentIds = path.split('/')
+                for (let i = 0; i < parentIds.length; i++) {
+                    permissionRelation.push({
+                        'permission_id':parentIds[i],
+                        'share_id':roleId,
+                        'type':1
+                    })
+
+                }
+
+            },
+            openPermission(item){
+
+                axios.get(`/api/role/${item.id}/permission`).then(({data})=>{
+                    //console.log('permission',data)
+                    this.editedItem = item
+                    this.permissionList = data.data
+                    this.selectedPermissions.splice(0)
+                    this.getSelectedPermissions(this.permissionList)
+                    this.dialogPermission = true
+                })
+            },
+            savePermission(){
+                const permissionRelation = []
+                const roleId = this.editedItem.id
+                this.selectedPermissions.forEach((item) =>{
+                    this.getParentPermissions(item.path,permissionRelation,roleId)
+                    permissionRelation.push({
+                        'permission_id':item.id,
+                        'share_id':roleId,
+                        'type':1
+                    })
+                })
+                axios.post('/api/role/setPermission',permissionRelation).then(({data})=>{
+                    console.log(data)
+                    this.closePermission()
+                })
+            },
+            closePermission(){
+                this.editedItem={}
+                this.dialogPermission = false
             }
+
+        },
+        computed: {
+            formTitle () {
+                return this.editedIndex === -1 ? '新增角色' : '修改角色'
+            },
+            curRoleName(){
+                return this.editedItem.name?this.editedItem.name:''
+            }
+        },
+        watch: {
+            options: {
+                handler (val, oldVal) {
+                    //console.log(val,oldVal)
+                    this.query()
+                },
+                deep: true,
+            },
         },
     })
 </script>
