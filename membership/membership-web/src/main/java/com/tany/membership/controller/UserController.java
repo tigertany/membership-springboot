@@ -120,7 +120,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Integer[] ids)
+    public JSONResult delUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Long[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 

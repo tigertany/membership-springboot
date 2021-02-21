@@ -21,7 +21,7 @@
       SELECT *
       FROM sys_permission
       where deleted=0 and parent_id=#{permissionId}
-      order by id
+      order by sort
     </select>
 
     <resultMap id="selectPermissionByRoleResult" type="PermissionWithChecked" >
@@ -137,7 +137,7 @@
         left join (<include refid="menusData"/>) A3 on A2.id=A3.parent_id
         left join (<include refid="menusData"/>) A4 on A3.id=A4.parent_id
         where A1.parent_id=0 and A1.type=1
-        order by A1.sort
+        order by A1.sort,A2.sort,A3.sort
     </select>
     <sql id="menusData" >
         SELECT A.* FROM sys_permission A

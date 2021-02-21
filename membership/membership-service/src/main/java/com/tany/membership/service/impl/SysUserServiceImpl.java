@@ -69,7 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public boolean delete(String curUserId, Integer[] ids) {
+    public boolean delete(String curUserId, Long[] ids) {
         List<SysUser> list = new ArrayList<>();
         for (int i = 0; i < ids.length; i++)
         {

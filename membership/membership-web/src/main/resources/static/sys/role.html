@@ -389,6 +389,8 @@
 
                 const parentIds = path.split('/')
                 for (let i = 0; i < parentIds.length; i++) {
+                    if (permissionRelation.findIndex(item=>item.permission_id==parentIds[i])>-1)
+                        continue
                     permissionRelation.push({
                         'permission_id':parentIds[i],
                         'share_id':roleId,
@@ -427,6 +429,7 @@
             },
             closePermission(){
                 this.editedItem={}
+                this.selectedPermissions=[]
                 this.dialogPermission = false
             }
 

@@ -123,8 +123,8 @@ public class RoleController {
         {
             return JSONResult.error("无此角色！");
         }
-
     }
+
     @DeleteMapping("/{ids}")
     public JSONResult delRole(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable("ids") Integer[] ids)
     {

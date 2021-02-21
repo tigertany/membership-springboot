@@ -34,12 +34,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(miniInterceptor()).addPathPatterns(Constant.BASE_API_PATH + "/**");
-        registry.addInterceptor(loginInterceptor()).addPathPatterns(Constant.BASE_API_PATH + "/**")
+        registry.addInterceptor(loginInterceptor())
+                //.addPathPatterns("/*.html")
+                .addPathPatterns(Constant.BASE_API_PATH + "/**")
 //			.addPathPatterns("/user/**")
 //	        .addPathPatterns("/buss/**")
 //		    .addPathPatterns("/weixin/**")
                 .excludePathPatterns(Constant.BASE_API_PATH + "/ex/**");
-        registry.addInterceptor(permissionInterceptor()).addPathPatterns(Constant.BASE_API_PATH + "/**")
+        registry.addInterceptor(permissionInterceptor())
+                //.addPathPatterns("/*.html")
+                .addPathPatterns(Constant.BASE_API_PATH + "/**")
                 .excludePathPatterns(Constant.BASE_API_PATH + "/ex/**");
 
     }

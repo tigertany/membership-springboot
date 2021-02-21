@@ -51,9 +51,9 @@
                     <v-container fluid >
                         <v-row no-gutters>
                             <v-col cols="12" class="text-right">
-                                <v-btn color="info" @click="openAdd" >新增</v-btn>
-                                <v-btn color="success" @click="initialize" >查询</v-btn>
-                                <v-btn color="error" @click="openBatchDel(null)" >删除</v-btn>
+                                <v-btn v-if="btnAdd" color="info" @click="openAdd" >新增</v-btn>
+                                <v-btn v-if="btnQuery" color="success" @click="initialize" >查询</v-btn>
+                                <v-btn v-if="btnDel" color="error" @click="openBatchDel(null)" >删除</v-btn>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -97,14 +97,14 @@
 
 
                     <template v-slot:item.actions="{ item ,index}">
-                        <v-icon
+                        <v-icon v-if="btnUpdate"
                                 small
                                 class="mr-2"
                                 @click="openEdit(item,index)"
                         >
                             mdi-pencil
                         </v-icon>
-                        <v-icon
+                        <v-icon v-if="btnDel"
                                 small
                                 @click="openBatchDel(item)"
                         >
@@ -277,6 +277,16 @@
             el:'#app',
             vuetify:new Vuetify(),
             data:{
+                menuId : 1001,
+                elements:[{id:100101,name:'btnAdd'},
+                    {id:100102,name:'btnQuery'},
+                    {id:100103,name:'btnUpdate'},
+                    {id:100104,name:'btnDel'}],
+                btnAdd:false,
+                btnDel:false,
+                btnQuery:false,
+                btnUpdate:false,
+
                 loading : false,
                 dialogEdit: false,
                 dialogDelete : false,
@@ -325,8 +335,22 @@
                 //this.initialize()
             },
             mounted(){
+                let menus = JSON.parse(sessionStorage.getItem('menus'))
 
+                let menu = this.getMenuById(menus)
+                //console.log('menu:',menu)
+                if (menu && menu.sub_menus){
+                    menu.sub_menus.forEach((item)=>{
+
+                        this.elements.forEach((ele)=>{
+                            if (item.id==ele.id){
+                                this.$data[ele.name]=true
+                            }
+                        })
+                    })
+                }
             },
+
             methods:{
                 initialize(){
                     this.loading = true
@@ -446,6 +470,25 @@
                    }).then((res)=>{
                        this.roleList = res.data.data.rows;
                    })
+                },
+                getMenuById(menus){
+                    let curMenu={}
+                    if (menus){
+                        for (let i = 0; i < menus.length; i++) {
+                            if (menus[i].id==this.menuId){
+                                curMenu = menus[i]
+                            }
+                            else {
+                                if (menus[i].sub_menus)
+                                    curMenu =  this.getMenuById(menus[i].sub_menus)
+                            }
+                            if (curMenu){
+                                return curMenu
+                            }
+                        }
+                    }
+
+
                 },
                 statusText(status){
                     return status==0?'未锁定':'锁定'

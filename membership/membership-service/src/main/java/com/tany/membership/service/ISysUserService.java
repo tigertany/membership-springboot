@@ -26,7 +26,7 @@ public interface ISysUserService extends IService<SysUser> {
     IPage<UserWithRole> getUserList(IPage<UserWithRole> page, Wrapper<UserWithRole> queryWrapper);
     List<UserWithRole> getUserList3(MyPage page, Wrapper<UserWithRole> queryWrapper);
     boolean save(String curUserId,SaveUserAndRoles saveUserAndRoles);
-    boolean delete(String curUserId,Integer[] ids);
+    boolean delete(String curUserId,Long[] ids);
     PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, LinkedHashMap<String,Object> search);
 
     UserWithRole queryById(long id);

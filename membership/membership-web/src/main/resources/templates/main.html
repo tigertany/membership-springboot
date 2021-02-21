@@ -45,6 +45,7 @@
                             v-for="(item, index) in profile"
                             :key="index"
                             link
+                            @click="profileAction(item.title)"
                     >
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item>
@@ -165,18 +166,31 @@
 
 <script>
     //:onload="`const oIframe = document.getElementById('${i}iframe');const deviceHeight = document.documentElement.clientHeight;oIframe.style.height = Number(deviceHeight)-160+'px';`"
+
+    /*axios.interceptors.request.use(function (config) {
+        //console.log('config:',config)
+        config.headers.common['tokenid']=sessionStorage.getItem('tokenid')
+        return config;
+    }, function (error) {
+        // 对请求错误做些什么
+        return Promise.reject(error);
+    });*/
     new Vue({
         el: '#app',
         vuetify: new Vuetify(),
         data:{
-            profile:[{
+            profile:[
+                {
                 title:'个人资料'
-            },{
+                },
+                {
                 title:'修改密码'
-            },{
+                },
+                {
                 title:'设置'
-            },{
-                title:'客户的需求高于一切'
+                },
+                {
+                title:'退出'
             }],
             drawer: null,
             menus:[],
@@ -186,15 +200,19 @@
             curTab: null,
 
         },
+        created(){
+            const token = sessionStorage.getItem('tokenid')
+            if (!token){
+                location.href = '/static/login.html'
+            }
+            axios.defaults.headers.common['tokenid'] = token;
+        },
         mounted(){
-            axios.get('/api/permission/getmenusbyuser', {
-                params: {
-                    CURUSER_ID:1
-                }
-            })
+            axios.get('/api/permission/getmenusbyuser')
             .then((res) => {
                 this.menus = res.data.data;
-                console.log(res.data.data);
+                sessionStorage.setItem('menus',JSON.stringify(this.menus))
+                //console.log(res.data.data);
             })
 
           this.tabs.push({
@@ -203,6 +221,29 @@
             })
         },
         methods:{
+            profileAction(title){
+                switch (title) {
+                case '个人资料':
+                    this.userExit()
+                        break;
+                case '修改密码':
+                    this.userExit()
+                    break;
+                case '设置':
+                    this.userExit()
+                    break;
+                case '退出':
+                    this.userExit()
+                    break;
+                default:
+                    break;
+                }
+            },
+            userExit(){
+                sessionStorage.removeItem('tokenid')
+                sessionStorage.removeItem('menus')
+                location.href="/static/login.html"
+            },
             extendMenu(menu){
                 /*for (let i = 0; i < this.menus.length; i++) {
                     if (this.menus[i].menuName==menu.menuName){

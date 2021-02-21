@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author tany
@@ -18,7 +18,7 @@ public class SysUser implements Serializable {
     private static final long serialVersionUID=1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String account;
 
@@ -43,11 +43,11 @@ public class SysUser implements Serializable {
     private Date deletedDate;
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

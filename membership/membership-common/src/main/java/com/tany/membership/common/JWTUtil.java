@@ -16,12 +16,11 @@ import java.util.Set;
 public class JWTUtil {
 	// 过期时间1天
     private static final long EXPIRE_TIME = 24*60*60*1000;
-    
+
     private static final String SECRET = "membership-tany";
     /**
      * 校验token是否正确
      * @param token 密钥
-     * @param secret 用户的密码
      * @return 是否正确
      */
     public static boolean verify(String token) {
@@ -52,24 +51,15 @@ public class JWTUtil {
 
     /**
      * 生成签名,指定时间后过期,一经生成不可修改，令牌在指定时间内一直有效
-     * @param userId 用户ID
-     * @param openId 用户的openid
      * @return 加密的token
      */
-    public static String sign(String userId,String openId,Set<String> permissionSet) {
+    public static String sign(Long userId) {
         try {
             Date date = new Date(System.currentTimeMillis()+EXPIRE_TIME);
             Algorithm algorithm = Algorithm.HMAC256(SECRET);
-            
-            
-            if (permissionSet==null) {
-            	permissionSet = new HashSet<String>();
-			}
-            
+
             return JWT.create()
                     .withClaim(Constant.USER_ID, userId)
-                    .withClaim(Constant.OPEN_ID, openId)
-                    .withArrayClaim(Constant.PERMISSION_KEY,permissionSet.toArray(new String[permissionSet.size()]))
                     .withExpiresAt(date).sign(algorithm);
         } catch (UnsupportedEncodingException e) {
         	e.printStackTrace();

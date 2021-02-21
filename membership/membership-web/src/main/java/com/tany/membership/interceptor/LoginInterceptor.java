@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.Claim;
 import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.annotation.Auth;
 import com.tany.membership.common.*;
+import com.tany.membership.dto.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,14 +75,10 @@ public class LoginInterceptor implements HandlerInterceptor {
             returnErrorResponse(response, JSONResult.error("不是有效的token0"));
             return false;
         }
-        String userId = claimMap.get(Constant.USER_ID).asString();
-        if (StringUtils.isBlank(userId)) {
+        Long userId = claimMap.get(Constant.USER_ID).asLong();
+
+        if (userId==null) {
             returnErrorResponse(response, JSONResult.error("不是有效的token1"));
-            return false;
-        }
-        String openId = claimMap.get(Constant.OPEN_ID).asString();
-        if (StringUtils.isBlank(openId)) {
-            returnErrorResponse(response, JSONResult.error("不是有效的token2"));
             return false;
         }
         if (!JWTUtil.verify(token)) {
@@ -89,6 +86,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             return false;
         }
         request.setAttribute(Constant.CURUSER_ID, userId);
+
         return true;
     }
 

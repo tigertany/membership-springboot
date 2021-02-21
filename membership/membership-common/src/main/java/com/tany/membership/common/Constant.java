@@ -9,4 +9,5 @@ public class Constant {
 	public static final String BASE_API_PATH = "/api";
 	public static final String OPEN_ID = "OPEN_ID";
 	public static final String PERMISSION_KEY = "Permission";
+	public static final String USERPROFILE = "USER_PROFILE";
 }

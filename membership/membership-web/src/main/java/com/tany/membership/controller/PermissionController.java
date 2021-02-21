@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@Anonymous
+//@Anonymous
 @RequestMapping(Constant.BASE_API_PATH+"/permission")
 public class PermissionController {
     private static final Logger logger = LoggerFactory.getLogger(PermissionController.class);
@@ -112,7 +112,7 @@ public class PermissionController {
 
 
     @GetMapping("/getmenusbyuser")
-    public JSONResult getMenuByUser(@RequestParam(Constant.CURUSER_ID) Long curUserId)
+    public JSONResult getMenuByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId)
     {
         JSONResult jsonResult = new JSONResult();
         jsonResult.setStatus(HttpStatus.OK);
