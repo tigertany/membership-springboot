@@ -43,10 +43,7 @@ public class RoleController {
     private ISysPermissionRelationService permissionRelationService;
 
     @GetMapping
-    public JSONResult getRoleList(@RequestParam(value = "pageIndex",required = false) long pageIndex,
-                                  @RequestParam(value = "pageSize",required = false) long pageSize,
-                                  @RequestParam(value = "sortColumn",required = false) String sortColumn,
-                                  @RequestParam(value = "sortMethod",required = false) String sortMethod,
+    public JSONResult getRoleList(Long pageIndex,Long pageSize,String sortColumn,String sortMethod,
                                   @RequestParam(required = false) LinkedHashMap<String,Object> search)
     {
         List<String> staticParams = Arrays.asList("pageIndex","pageSize","sortColumn","sortMethod");
@@ -126,7 +123,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{ids}")
-    public JSONResult delRole(@RequestParam(Constant.CURUSER_ID) String curUserId,@PathVariable("ids") Integer[] ids)
+    public JSONResult delRole(@RequestAttribute(Constant.CURUSER_ID) String curUserId,@PathVariable("ids") Integer[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -152,7 +149,7 @@ public class RoleController {
         }
     }
     @PostMapping
-    public JSONResult save(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
+    public JSONResult save(@RequestAttribute(value = Constant.CURUSER_ID) String curUserId,
                            @Validated @RequestBody SysRole role)
     {
         JSONResult jsonResult = new JSONResult();
@@ -176,7 +173,7 @@ public class RoleController {
 
     }
     @PostMapping("setUser")
-    public JSONResult setUser(@RequestParam(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list)
+    public JSONResult setUser(@RequestAttribute(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list)
     {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
@@ -194,7 +191,7 @@ public class RoleController {
         return jsonResult;
     }
     @PostMapping("setPermission")
-    public JSONResult setPermission(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@RequestBody ArrayList<SysPermissionRelation> sysPermissionRelations)
+    public JSONResult setPermission(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@RequestBody ArrayList<SysPermissionRelation> sysPermissionRelations)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -218,7 +215,7 @@ public class RoleController {
 
     }
     @GetMapping("/{id}/permission")
-    public JSONResult getPermissionByRole(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable("id") long roleId)
+    public JSONResult getPermissionByRole(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable("id") long roleId)
     {
         JSONResult jsonResult = new JSONResult();
         List<PermissionWithChecked> list = permissionService.getPermissionByRole(roleId);

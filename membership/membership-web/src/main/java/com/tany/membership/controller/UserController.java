@@ -40,10 +40,7 @@ public class UserController {
     private ISysUserRoleService userRoleService;
 
     @GetMapping
-    public JSONResult getUserList(@RequestParam(value = "pageIndex",required = false) long pageIndex,
-                                  @RequestParam(value = "pageSize",required = false) long pageSize,
-                              @RequestParam(value = "sortColumn",required = false) String sortColumn,
-                              @RequestParam(value = "sortMethod",required = false) String sortMethod,
+    public JSONResult getUserList(Long pageIndex,Long pageSize,String sortColumn,String sortMethod,
                               @RequestParam(required = false) LinkedHashMap<String,Object> search)
     {
         return JSONResult.ok(userService.query(pageIndex,pageSize,sortColumn,sortMethod,search));
@@ -92,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public JSONResult getUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable long id)
+    public JSONResult getUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable long id)
     {
         JSONResult jsonResult = new JSONResult();
 /*
@@ -120,7 +117,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@RequestParam(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Long[] ids)
+    public JSONResult delUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Long[] ids)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -137,7 +134,7 @@ public class UserController {
     }
 
     @PostMapping("/save")//@RequestBody SaveUserAndRoles saveUserAndRoles
-    public JSONResult save(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
+    public JSONResult save(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,
                            @RequestBody SaveUserAndRoles saveUserAndRoles) {
         JSONResult jsonResult = new JSONResult();
         //logger.info(saveUserAndRoles.toString());
@@ -155,7 +152,7 @@ public class UserController {
     }
 
     @PostMapping("/setrole")
-    public JSONResult setRole(@RequestParam(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list) {
+    public JSONResult setRole(@RequestAttribute(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list) {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
 

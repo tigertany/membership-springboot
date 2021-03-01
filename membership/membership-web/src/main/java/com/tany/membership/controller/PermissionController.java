@@ -40,7 +40,7 @@ public class PermissionController {
     }
 
     @PostMapping
-    public JSONResult savePermission(@RequestParam(value = Constant.CURUSER_ID,required = false,defaultValue = "demo") String curUserId,
+    public JSONResult savePermission(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,
                                      @RequestBody SysPermission sysPermission)
     {
         JSONResult jsonResult = new JSONResult();
@@ -84,7 +84,7 @@ public class PermissionController {
     }
 
     @GetMapping("/byUser")
-    public JSONResult getPermissionByUser(@RequestParam(Constant.CURUSER_ID) Long curUserId)
+    public JSONResult getPermissionByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId)
     {
         JSONResult jsonResult = new JSONResult();
         jsonResult.setStatus(HttpStatus.OK);
@@ -94,7 +94,7 @@ public class PermissionController {
 
 
     @PostMapping("/saveRolePermission")
-    public JSONResult saveRolePermission(@RequestParam(Constant.CURUSER_ID) Long curUserId,Long userId, List<SysPermissionRelation> list)
+    public JSONResult saveRolePermission(@RequestAttribute(Constant.CURUSER_ID) Long curUserId,Long userId, List<SysPermissionRelation> list)
     {
         JSONResult jsonResult = new JSONResult();
 
@@ -111,7 +111,7 @@ public class PermissionController {
 
 
 
-    @GetMapping("/getmenusbyuser")
+    @GetMapping("/getMenusByUser")
     public JSONResult getMenuByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId)
     {
         JSONResult jsonResult = new JSONResult();
