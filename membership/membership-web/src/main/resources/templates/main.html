@@ -208,7 +208,7 @@
             axios.defaults.headers.common['tokenid'] = token;
         },
         mounted(){
-            axios.get('/api/permission/getmenusbyuser')
+            axios.get('/api/permission/getMenusByUser')
             .then((res) => {
                 this.menus = res.data.data;
                 sessionStorage.setItem('menus',JSON.stringify(this.menus))
