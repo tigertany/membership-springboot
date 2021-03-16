@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tany.membership.common.JSONResult;
+import com.tany.membership.common.JWTUtil;
 import com.tany.membership.common.MyPage;
 import com.tany.membership.common.PagedResult;
 import com.tany.membership.dao.SysUserMapper;
@@ -122,4 +122,49 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         return null;
     }
+
+    @Override
+    public String login(String account, String pwd)  {
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+
+        wrapper.eq("account",account);
+
+        SysUser user = userService.getOne(wrapper);
+
+        if (user==null)
+        {
+            throw new RuntimeException("无此用户!");
+        }
+        if (!user.getPassword().equalsIgnoreCase(pwd))
+        {
+            throw new RuntimeException("密码错误!");
+        }
+        return JWTUtil.sign(user.getId());
+    }
+
+    @Override
+    public boolean changePassword(String account, String oldPassword, String newPassword) {
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+
+        wrapper.eq("account",account);
+
+        SysUser user = userService.getOne(wrapper);
+
+        if (user==null)
+        {
+            throw new RuntimeException("无此用户!");
+        }
+        if (!user.getPassword().equalsIgnoreCase(oldPassword))
+        {
+            throw new RuntimeException("密码错误!");
+        }
+
+        user.setPassword(newPassword);
+        QueryWrapper<SysUser> updateWrapper = new QueryWrapper<>();
+        updateWrapper.eq("password",newPassword);
+
+        return userService.update(updateWrapper);
+    }
+
+
 }

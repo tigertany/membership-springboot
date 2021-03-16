@@ -33,25 +33,35 @@ public class JSONResult {
         this.data = data;
     }
 
-    public JSONResult(){}
+    public JSONResult() {
+    }
 
-    public JSONResult(HttpStatus httpStatus,String message,Object data) {
+    public JSONResult(HttpStatus httpStatus, String message, Object data) {
         this.status = httpStatus.value();
         this.msg = message;
         this.data = data;
     }
 
-    public static <T> JSONResult ok(T t) {
-        return new JSONResult(HttpStatus.OK,"ok",t);
+    public static <T> JSONResult ok()
+    {
+        return JSONResult.ok(null);
     }
+
+    public static <T> JSONResult ok(T t)
+    {
+        return new JSONResult(HttpStatus.OK, "ok", t);
+    }
+
     public static JSONResult error(String message) {
-        return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR,message,null);
+        return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR, message, null);
     }
-    public static <T> JSONResult error(String message,T t) {
-        return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR,message,t);
+
+    public static <T> JSONResult error(String message, T t) {
+        return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR, message, t);
     }
+
     public static <T> JSONResult noAuth(String message) {
-        return new JSONResult(HttpStatus.UNAUTHORIZED,message,null);
+        return new JSONResult(HttpStatus.UNAUTHORIZED, message, null);
     }
-	
+
 }
