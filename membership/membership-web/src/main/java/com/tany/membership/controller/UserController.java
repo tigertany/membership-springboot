@@ -1,36 +1,25 @@
 package com.tany.membership.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
-import com.tany.membership.common.MyPage;
-import com.tany.membership.common.PagedResult;
 import com.tany.membership.dto.SaveUserAndRoles;
-import com.tany.membership.entity.SysRole;
-import com.tany.membership.entity.SysUser;
 import com.tany.membership.entity.SysUserRole;
+import com.tany.membership.service.ISysPermissionService;
 import com.tany.membership.service.ISysUserRoleService;
 import com.tany.membership.service.ISysUserService;
 import com.tany.membership.vo.UserWithRole;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Anonymous
-@RequestMapping(Constant.BASE_API_PATH +"/user")
+@RequestMapping(Constant.BASE_API_PATH)
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -38,12 +27,14 @@ public class UserController {
     private ISysUserService userService;
     @Autowired
     private ISysUserRoleService userRoleService;
+    @Autowired
+    private ISysPermissionService permissionService;
 
-    @GetMapping
+    @GetMapping("/users")
     public JSONResult getUserList(Long pageIndex,Long pageSize,String sortColumn,String sortMethod,
-                              @RequestParam(required = false) LinkedHashMap<String,Object> search)
+                              @RequestParam(required = false) Map<String,Object> search)
     {
-        return JSONResult.ok(userService.query(pageIndex,pageSize,sortColumn,sortMethod,search));
+        return JSONResult.success(userService.query(pageIndex,pageSize,sortColumn,sortMethod,search));
     /*
         Page<UserWithRole> page = new Page<>(pageIndex,3); //查询第一页，查询1条数据
         //page.setSearchCount(false);
@@ -88,85 +79,72 @@ public class UserController {
 
     }
 
-    @GetMapping("/{id}")
-    public JSONResult getUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable long id)
-    {
-        JSONResult jsonResult = new JSONResult();
-/*
-        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-
-
-        queryWrapper.eq(SysUser::getId, id);
-        queryWrapper.eq(SysUser::getDeleted, 0);
-        //queryWrapper.eq("CREATER_ID", userId);
-
-        SysUser entity = userService.getOne(queryWrapper,false);
-*/
-
-        UserWithRole userWithRole = userService.queryById(id);
-        if(userWithRole!=null)
-        {
-            jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setData(userWithRole);
-            return jsonResult;
-        }
-        else
-        {
-            return JSONResult.error("无此用户！");
+    @GetMapping("/user/{id}")
+    public JSONResult getUser(@RequestAttribute(value = Constant.CURUSER_ID, required = false) Long curUserId, @PathVariable Long id) {
+        UserWithRole userWithRole = userService.queryById(id == null ? curUserId : id);
+        if (userWithRole != null) {
+            return JSONResult.success(userWithRole);
+        } else {
+            return JSONResult.fail("无此用户！");
         }
     }
 
-    @DeleteMapping("/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,@PathVariable Long[] ids)
-    {
-        JSONResult jsonResult = new JSONResult();
+    @GetMapping("/user/{id}/permissions")
+    public JSONResult getPermissionByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable Long id) {
+        return JSONResult.success(permissionService.getPermissionByUser(id == null ? curUserId : id));
+    }
 
+    @GetMapping("/user/{id}/menus")
+    public JSONResult getMenuByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable Long id)
+    {
+        return JSONResult.success(permissionService.getMenusByUser(id == null ? curUserId : id));
+    }
+
+    @DeleteMapping("/user/{ids}")//url:delete/1,2,3
+    public JSONResult delUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) Long curUserId,@PathVariable Long[] ids)
+    {
         if(userService.delete(curUserId,ids))
         {
-            jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setMsg("删除成功!");
-            return jsonResult;
+            return JSONResult.success("删除成功!");
         }
         else
         {
-            return JSONResult.error("删除失败！");
+            return JSONResult.fail("删除失败！");
         }
     }
 
-    @PostMapping("/save")//@RequestBody SaveUserAndRoles saveUserAndRoles
-    public JSONResult save(@RequestAttribute(value = Constant.CURUSER_ID,required = false) String curUserId,
+
+
+    @PostMapping("/user")//@RequestBody SaveUserAndRoles saveUserAndRoles
+    public JSONResult save(@RequestAttribute(value = Constant.CURUSER_ID, required = false) Long curUserId,
                            @RequestBody SaveUserAndRoles saveUserAndRoles) {
-        JSONResult jsonResult = new JSONResult();
         //logger.info(saveUserAndRoles.toString());
 
-        if (userService.save(curUserId,saveUserAndRoles)) {
-            jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setMsg("保存成功！");
-
+        if (userService.save(curUserId, saveUserAndRoles)) {
+            return JSONResult.success("保存成功！");
         } else {
-            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            jsonResult.setMsg("保存失败！");
+            return JSONResult.fail("保存失败！");
         }
-        return jsonResult;
 
     }
 
-    @PostMapping("/setrole")
-    public JSONResult setRole(@RequestAttribute(Constant.CURUSER_ID) String curUserId, List<SysUserRole> list) {
+    /**
+     * 修改并保存某个用户的角色
+     * @param curUserId
+     * @param list
+     * @return
+     */
+    @PutMapping("/user/role")
+    public JSONResult setRole(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, List<SysUserRole> list) {
         JSONResult jsonResult = new JSONResult();
         //logger.info(user.toString());
 
 
         if (userRoleService.saveBatch(list)) {
-            jsonResult.setStatus(HttpStatus.OK);
-            jsonResult.setMsg("保存成功！");
+            return JSONResult.success("角色保存成功！");
         } else {
-            jsonResult.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            jsonResult.setMsg("保存失败！");
+            return JSONResult.fail("角色保存失败！");
         }
-
-
-        return jsonResult;
 
     }
 }

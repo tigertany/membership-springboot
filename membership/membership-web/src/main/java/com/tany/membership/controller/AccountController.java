@@ -7,7 +7,9 @@ import com.tany.membership.service.ISysPermissionService;
 import com.tany.membership.service.ISysRoleService;
 import com.tany.membership.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping(Constant.BASE_API_PATH)
 public class AccountController {
 
     @Autowired
@@ -28,7 +31,7 @@ public class AccountController {
     @Autowired
     private ISysPermissionService permissionService;
 
-    @PostMapping(Constant.BASE_API_PATH+"/ex/login")
+    @PostMapping("/ex/login")
     public JSONResult doLogin(HttpServletResponse response,String account, String pwd, Boolean remember)
     {
         Map<String, Object> resultMap = new HashMap<>();
@@ -50,16 +53,16 @@ public class AccountController {
         }
         //resultMap.put("permissions",permissions);
 
-        return JSONResult.ok(resultMap);
+        return JSONResult.success(resultMap);
     }
 
-    @PostMapping("changepwd")
-    public JSONResult changePassword(String account, String pwd,String newPwd){
+    @PostMapping("/account/{account}/changepwd")
+    public JSONResult changePassword(@PathVariable("account") String account, String pwd, String newPwd){
         if(userService.changePassword(account,pwd,newPwd)){
-            return JSONResult.ok(null);
+            return JSONResult.success("密码修改成功!");
         }
         else {
-            return JSONResult.error("修改失败");
+            return JSONResult.fail("密码修改失败");
         }
 
     }

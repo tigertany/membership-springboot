@@ -51,12 +51,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean save(String curUserId,SaveUserAndRoles saveUserAndRoles) {
+    public boolean save(long curUserId,SaveUserAndRoles saveUserAndRoles) {
         SysUser sysUser = saveUserAndRoles.getSysUser();
         List<SysUserRole> sysUserRoleList = saveUserAndRoles.getSysUserRoleList();
 
         sysUser.setRecordDate(new Date());
-        sysUser.setRecorder(curUserId);
+        sysUser.setRecorder(String.valueOf(curUserId));
 
         QueryWrapper<SysUserRole> sysUserRoleQueryWrapper = new QueryWrapper<>();
         sysUserRoleQueryWrapper.eq("user_id",sysUser.getId());
@@ -69,7 +69,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public boolean delete(String curUserId, Long[] ids) {
+    public boolean delete(long curUserId, Long[] ids) {
         List<SysUser> list = new ArrayList<>();
         for (int i = 0; i < ids.length; i++)
         {
@@ -84,7 +84,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, LinkedHashMap<String, Object> search) {
+    public PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, Map<String, Object> search) {
         MyPage page = new MyPage(pageIndex,pageSize,sortColumn,sortMethod);
 
         QueryWrapper<UserWithRole> wrapper = new QueryWrapper<>();

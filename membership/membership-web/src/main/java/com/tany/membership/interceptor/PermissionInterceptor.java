@@ -106,7 +106,7 @@ public class PermissionInterceptor implements HandlerInterceptor{
 				return true;
 			}
 		}
-		returnErrorResponse(response,JSONResult.error("无权限"));
+		returnErrorResponse(response,JSONResult.noAuth("无权限"));
 		return false;
 
 	}

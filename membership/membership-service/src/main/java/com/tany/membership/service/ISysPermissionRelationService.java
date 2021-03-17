@@ -14,5 +14,6 @@ import java.util.List;
  * @since 2021-01-20
  */
 public interface ISysPermissionRelationService extends IService<SysPermissionRelation> {
-    boolean saveRolePermission(Long userId,List<SysPermissionRelation> list);
+    boolean saveRolePermission(long userId,List<SysPermissionRelation> list);
+    boolean setPermission(long curUserId,List<SysPermissionRelation> sysPermissionRelations);
 }

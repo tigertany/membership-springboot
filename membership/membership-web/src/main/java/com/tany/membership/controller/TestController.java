@@ -20,7 +20,7 @@ public class TestController {
     @GetMapping("/list")
     public JSONResult getUser()
     {
-        return JSONResult.ok(userService.list());
+        return JSONResult.success(userService.list());
     }
 
     @GetMapping("/view")

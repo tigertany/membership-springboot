@@ -4,7 +4,6 @@ import com.tany.membership.common.CommonUtils;
 import com.tany.membership.common.JSONResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @ControllerAdvice
@@ -55,14 +53,21 @@ public class GlobalExceptionHandler {
 		CommonUtils.printException(logger, ex);
 		
 
-		return JSONResult.error(fieldError.getDefaultMessage());
+		return JSONResult.fail(fieldError.getDefaultMessage());
 
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseBody
+	public JSONResult globalException(RuntimeException ex) {
+		CommonUtils.printException(logger, ex);
+		return JSONResult.fail(ex.getMessage() == null ? ex.toString() : ex.getMessage(), ex.getStackTrace()[0]);
 	}
 
 	// @ResponseStatus(HttpStatus.OK)
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
-	public JSONResult globalException(HttpServletRequest request, HttpServletResponse response, Exception ex) {
+	public JSONResult globalException( Exception ex) {
 		// JSONResult jsonResult = new JSONResult();
 		// if (isAjax(request)) {
 		// jsonResult.setStatus(response.getStatus());
@@ -72,9 +77,7 @@ public class GlobalExceptionHandler {
 		// }
 
 		CommonUtils.printException(logger, ex);
-		
-		return new JSONResult( HttpStatus.INTERNAL_SERVER_ERROR , ex.getMessage() == null ? ex.toString() : ex.getMessage(), ex.getStackTrace()[0]);
-
+		return JSONResult.fail(ex.getMessage() == null ? ex.toString() : ex.getMessage(), ex.getStackTrace()[0]);
 	}
 
 	public static boolean isAjax(HttpServletRequest httpRequest) {

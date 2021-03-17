@@ -2,12 +2,12 @@ package com.tany.membership.common;
 
 import org.springframework.http.HttpStatus;
 
-public class JSONResult {
+public class JSONResult<T> {
     private int status;
 
     private String msg;
 
-    private Object data;
+    private T data;
 
     public int getStatus() {
         return status;
@@ -25,39 +25,44 @@ public class JSONResult {
         this.msg = msg;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 
     public JSONResult() {
     }
 
-    public JSONResult(HttpStatus httpStatus, String message, Object data) {
+    public JSONResult(HttpStatus httpStatus, String message, T data) {
         this.status = httpStatus.value();
         this.msg = message;
         this.data = data;
     }
 
-    public static <T> JSONResult ok()
+    public static <T> JSONResult <T> success(String message ,T t)
     {
-        return JSONResult.ok(null);
+        return new JSONResult(HttpStatus.OK, message, t);
     }
 
-    public static <T> JSONResult ok(T t)
+    public static <T> JSONResult <T> success(T t)
     {
-        return new JSONResult(HttpStatus.OK, "ok", t);
+        return success("success", t);
     }
 
-    public static JSONResult error(String message) {
-        return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR, message, null);
+    public static <T> JSONResult success(String message)
+    {
+        return success(message,null);
     }
 
-    public static <T> JSONResult error(String message, T t) {
+    public static <T> JSONResult <T> fail(String message, T t) {
         return new JSONResult(HttpStatus.INTERNAL_SERVER_ERROR, message, t);
+    }
+
+    public static JSONResult fail(String message) {
+        return fail(message, null);
     }
 
     public static <T> JSONResult noAuth(String message) {

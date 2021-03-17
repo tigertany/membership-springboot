@@ -23,12 +23,23 @@ import java.util.List;
 public class SysPermissionRelationServiceImpl extends ServiceImpl<SysPermissionRelationMapper, SysPermissionRelation> implements ISysPermissionRelationService {
     @Transactional
     @Override
-    public boolean saveRolePermission(Long userId,List<SysPermissionRelation> list) {
+    public boolean saveRolePermission(long userId,List<SysPermissionRelation> list) {
         QueryWrapper<SysPermissionRelation> wrapper = new QueryWrapper<>();
 
+        wrapper.eq("type",1);
         wrapper.in("share_id",list.stream().map(s->s.getShareId()).toArray());
 
         ISysPermissionService.permissionCache.remove(userId);
+        return this.remove(wrapper) && this.saveBatch(list);
+    }
+
+    @Override
+    public boolean setPermission(long curUserId, List<SysPermissionRelation> list) {
+        QueryWrapper<SysPermissionRelation> wrapper = new QueryWrapper<>();
+        wrapper.eq("type",1);
+        wrapper.in("share_id",list.stream().map(s->s.getShareId()).toArray());
+
+        ISysPermissionService.permissionCache.remove(curUserId);
         return this.remove(wrapper) && this.saveBatch(list);
     }
 }

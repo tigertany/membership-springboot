@@ -22,12 +22,12 @@ import java.util.List;
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements ISysPermissionService {
 
     @Override
-    public List<PermissionWithChecked> getPermissionByRole(Long roleId) {
-        return this.baseMapper.selectPermissionByRole(roleId,0L);
+    public List<PermissionWithChecked> getPermissionByRole(long roleId) {
+        return this.baseMapper.selectPermissionByRole(roleId,0);
     }
 
     @Override
-    public List<SysPermission> getPermissionByUser(Long userId) {
+    public List<SysPermission> getPermissionByUser(long userId) {
 
         if (!permissionCache.containsKey(userId))
         {
@@ -38,13 +38,13 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
     }
 
     @Override
-    public List<Menu> getMenusByUser(Long userId) {
+    public List<Menu> getMenusByUser(long userId) {
         return this.baseMapper.getMenusByUser(userId);
     }
 
     @Override
     public List<PermissionWithChecked> getPermissionList() {
-        return this.baseMapper.getPermissionList(0L);
+        return this.baseMapper.getPermissionList(0);
     }
 
 

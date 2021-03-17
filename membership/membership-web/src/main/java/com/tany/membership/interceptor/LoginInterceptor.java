@@ -4,7 +4,6 @@ import com.auth0.jwt.interfaces.Claim;
 import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.annotation.Auth;
 import com.tany.membership.common.*;
-import com.tany.membership.dto.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,22 +66,22 @@ public class LoginInterceptor implements HandlerInterceptor {
     private Boolean checkLogin(HttpServletRequest request, HttpServletResponse response, String token) {
         logger.info("认证拦截器:" + token);
         if (StringUtils.isBlank(token)) {
-            returnErrorResponse(response, JSONResult.error("未登录,token不存在"));
+            returnErrorResponse(response, JSONResult.fail("未登录,token不存在"));
             return false;
         }
         Map<String, Claim> claimMap = JWTUtil.getClaim(token);
         if (claimMap == null) {
-            returnErrorResponse(response, JSONResult.error("不是有效的token0"));
+            returnErrorResponse(response, JSONResult.fail("不是有效的token0"));
             return false;
         }
         Long userId = claimMap.get(Constant.USER_ID).asLong();
 
         if (userId==null) {
-            returnErrorResponse(response, JSONResult.error("不是有效的token1"));
+            returnErrorResponse(response, JSONResult.fail("不是有效的token1"));
             return false;
         }
         if (!JWTUtil.verify(token)) {
-            returnErrorResponse(response, JSONResult.error("token校验失败"));
+            returnErrorResponse(response, JSONResult.fail("token校验失败"));
             return false;
         }
         request.setAttribute(Constant.CURUSER_ID, userId);

@@ -9,8 +9,8 @@ import com.tany.membership.dto.SaveUserAndRoles;
 import com.tany.membership.entity.SysUser;
 import com.tany.membership.vo.UserWithRole;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -23,9 +23,9 @@ import java.util.List;
 public interface ISysUserService extends IService<SysUser> {
     IPage<UserWithRole> getUserList(IPage<UserWithRole> page, Wrapper<UserWithRole> queryWrapper);
     List<UserWithRole> getUserList3(MyPage page, Wrapper<UserWithRole> queryWrapper);
-    boolean save(String curUserId,SaveUserAndRoles saveUserAndRoles);
-    boolean delete(String curUserId,Long[] ids);
-    PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, LinkedHashMap<String,Object> search);
+    boolean save(long curUserId,SaveUserAndRoles saveUserAndRoles);
+    boolean delete(long curUserId,Long[] ids);
+    PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, Map<String,Object> search);
 
     UserWithRole queryById(long id);
 

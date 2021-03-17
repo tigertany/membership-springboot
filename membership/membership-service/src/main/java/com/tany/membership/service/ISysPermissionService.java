@@ -21,11 +21,11 @@ public interface ISysPermissionService extends IService<SysPermission> {
 
     public static Map<Long,List<SysPermission>> permissionCache = new HashMap<>();
 
-    List<PermissionWithChecked> getPermissionByRole(Long roleId);
+    List<PermissionWithChecked> getPermissionByRole(long roleId);
 
-    List<SysPermission> getPermissionByUser(Long userId);
+    List<SysPermission> getPermissionByUser(long userId);
 
-    List<Menu> getMenusByUser(Long userId);
+    List<Menu> getMenusByUser(long userId);
 
     List<PermissionWithChecked> getPermissionList();
 }

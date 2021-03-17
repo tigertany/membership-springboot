@@ -17,11 +17,11 @@ import java.util.List;
  * @since 2021-01-20
  */
 public interface SysPermissionMapper extends BaseMapper<SysPermission> {
-    List<PermissionWithChecked> selectPermissionByRole(@Param("roleId") Long roleId,@Param("permissionId") Long permissionId);
+    List<PermissionWithChecked> selectPermissionByRole(@Param("roleId") long roleId,@Param("permissionId") long permissionId);
 
-    List<SysPermission> selectPermissionByUser(Long userId);
+    List<SysPermission> selectPermissionByUser(long userId);
 
-    List<Menu> getMenusByUser(Long userId);
+    List<Menu> getMenusByUser(long userId);
 
-    List<PermissionWithChecked> getPermissionList(Long parentId);
+    List<PermissionWithChecked> getPermissionList(long parentId);
 }
