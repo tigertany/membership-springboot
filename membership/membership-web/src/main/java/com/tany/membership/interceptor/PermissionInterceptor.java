@@ -44,16 +44,16 @@ public class PermissionInterceptor implements HandlerInterceptor{
 	    // 先判断 controller 类上是不是有注解 Permission
 	    // 如果有注解，则每个方法都需要进行权限校验
 	    Object controllerBean = method.getBean();
-	    	    
+
 	    Permission permissionOnClass = controllerBean.getClass().getAnnotation(Permission.class);
 	    Permission permissionOnMethod = method.getMethodAnnotation(Permission.class);
-	    
+
 	    AllowPass allowPassOnClass = controllerBean.getClass().getAnnotation(AllowPass.class);
 	    AllowPass allowPassOnMethod = method.getMethodAnnotation(AllowPass.class);
 
 	    if (permissionOnClass != null) {
 	        if (allowPassOnMethod != null) {
-	            
+
 	            return true;
 	        }
 	        else {
@@ -63,7 +63,7 @@ public class PermissionInterceptor implements HandlerInterceptor{
 	    else if (allowPassOnClass != null) {
 	        if (permissionOnMethod != null) {
 	        	return checkPermission(request, response);
-	            
+
 	        }
 	        else {
 	        	return true;
@@ -72,14 +72,14 @@ public class PermissionInterceptor implements HandlerInterceptor{
 	    else {
 	    	if (permissionOnMethod != null) {
 	        	return checkPermission(request, response);
-	            
+
 	        }
 		    if (allowPassOnMethod != null) {
 	        	return true;
 	        }
 		    return true;
 		}
-	    
+
 	}
 
 	private boolean checkPermission(HttpServletRequest request, HttpServletResponse response) {
@@ -106,7 +106,7 @@ public class PermissionInterceptor implements HandlerInterceptor{
 				return true;
 			}
 		}
-		returnErrorResponse(response,JSONResult.noAuth("无权限"));
+		returnErrorResponse(response,JSONResult.noAuth());
 		return false;
 
 	}

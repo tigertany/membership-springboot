@@ -65,8 +65,8 @@ public class JSONResult<T> {
         return fail(message, null);
     }
 
-    public static <T> JSONResult noAuth(String message) {
-        return new JSONResult(HttpStatus.UNAUTHORIZED, message, null);
+    public static <T> JSONResult noAuth() {
+        return new JSONResult(HttpStatus.UNAUTHORIZED, "无权限", null);
     }
 
 }

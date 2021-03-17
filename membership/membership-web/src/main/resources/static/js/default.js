@@ -1,5 +1,5 @@
 const base={
-    baseUrl:'https://localhost:8081',
+    baseUrl:'http://localhost:8081/api',
     chengpin:'/api/blueberrypai/getChengpinDetails.php',
     login:'/api/blueberrypai/login.php',
     music:"/sxtstu/music/baidu/list.php",
@@ -11,7 +11,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 axios.defaults.headers.common['tokenid'] = sessionStorage.getItem("tokenid");
 axios.defaults.baseURL = base.baseUrl;
 axios.defaults.timeout = 10000;
-axios.defaults.response.use(
+axios.interceptors.response.use(
     // 响应包含以下信息data,status,statusText,headers,config
     (res) => res.status === 200 ? Promise.resolve(res) : Promise.reject(res),
     (err) => {

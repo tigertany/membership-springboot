@@ -56,7 +56,7 @@ public class AccountController {
         return JSONResult.success(resultMap);
     }
 
-    @PostMapping("/account/{account}/changepwd")
+    @PostMapping("/account/{account}/changePassword")
     public JSONResult changePassword(@PathVariable("account") String account, String pwd, String newPwd){
         if(userService.changePassword(account,pwd,newPwd)){
             return JSONResult.success("密码修改成功!");

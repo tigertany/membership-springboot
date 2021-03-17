@@ -181,19 +181,19 @@
         el: '#app',
         vuetify: new Vuetify(),
         data:{
-            profile:[
+            profile: [
                 {
-                title:'个人资料'
+                    title: '个人资料'
                 },
                 {
-                title:'修改密码'
+                    title: '修改密码'
                 },
                 {
-                title:'设置'
+                    title: '设置'
                 },
                 {
-                title:'退出'
-            }],
+                    title: '退出'
+                }],
             drawer: null,
             menus:[],
             selectedMenu:1,
@@ -210,7 +210,7 @@
             axios.defaults.headers.common['tokenid'] = token;
         },
         mounted(){
-            axios.get('/api/permission/getMenusByUser')
+            axios.get('/user/0/menus')
             .then((res) => {
                 this.menus = res.data.data;
                 sessionStorage.setItem('menus',JSON.stringify(this.menus))

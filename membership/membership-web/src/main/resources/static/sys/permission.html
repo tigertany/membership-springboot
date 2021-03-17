@@ -202,7 +202,7 @@
                 Vue.set(this.currentItems[0],'path',selectedItem.text=='ROOT'?'0':selectedItem.path+'/'+selectedItem.value)
             },
             getList(){
-                axios.get('/api/permission').then(({data})=>{
+                axios.get('/permissions').then(({data})=>{
                     console.log(data.data)
 
 
@@ -236,7 +236,7 @@
             savePermission(){
                 const permission = Object.assign({},this.currentItems[0])
                 permission.parent_id = this.currentItems[0].parent_id.value
-                axios.post('/api/permission',permission).then(({data})=>{
+                axios.post('/permission',permission).then(({data})=>{
                     console.log(data)
                 })
             },
@@ -258,7 +258,7 @@
                 this.findAndDel(this.list,id)
 
                 if (id!=-1){
-                    axios.delete('/api/permission',{
+                    axios.delete('/permission',{
                         ...this.currentItems[0]
                     }).then(({data})=>{
                         console.log(data.data)

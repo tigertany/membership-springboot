@@ -96,6 +96,7 @@
 <script src="/static/vuetify/vuetify.js"></script>
 <script src="/static/axios/axios.js"></script>
 <script src="/static/axios/qs.js"></script>
+<script src="/static/js/default.js"></script>
 <script>
     new Vue({
         el: '#app',
@@ -110,7 +111,7 @@
         methods:{
             loginAction(){
 
-                axios.post('/api/ex/login',Qs.stringify(this.login) ).then((res)=>{
+                axios.post('/ex/login',Qs.stringify(this.login) ).then((res)=>{
 
                     console.log("res:",res)
                     if (res.data.status==200){

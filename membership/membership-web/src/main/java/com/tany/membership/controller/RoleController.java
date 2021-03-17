@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@Anonymous
+//@Anonymous
 @RequestMapping(Constant.BASE_API_PATH)
 public class RoleController {
     private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
@@ -138,7 +138,7 @@ public class RoleController {
      * @param roleId
      * @return
      */
-    @GetMapping("/role/{id}/permission")
+    @GetMapping("/role/{id}/permissions")
     public JSONResult getPermissionByRole(@PathVariable("id") Long roleId)
     {
         return JSONResult.success(permissionService.getPermissionByRole(roleId));

@@ -264,9 +264,6 @@
     <script src="/static/axios/qs.js"></script>
     <script src="/static/js/default.js"></script>
     <script>
-        //axios.defaults.headers.post['Content-Type'] ='application/x-www-form-urlencoded'
-
-
         Vue.directive('focus', {
             // 当被绑定的元素插入到 DOM 中时……
             inserted: function (el,binding) {
@@ -279,10 +276,10 @@
             vuetify:new Vuetify(),
             data:{
                 menuId : 1001,
-                elements:[{id:100101,name:'btnAdd'},
-                    {id:100102,name:'btnQuery'},
-                    {id:100103,name:'btnUpdate'},
-                    {id:100104,name:'btnDel'}],
+                elements: [{id: 100101, name: 'btnAdd'},
+                    {id: 100102, name: 'btnQuery'},
+                    {id: 100103, name: 'btnUpdate'},
+                    {id: 100104, name: 'btnDel'}],
                 btnAdd:false,
                 btnDel:false,
                 btnQuery:false,
@@ -366,7 +363,7 @@
                         ...this.search
                     }
 
-                    axios.get('/api/user/?', {
+                    axios.get('/users', {
                         params
                     }).then((res) => {
                         this.desserts = res.data.data.rows;
@@ -382,12 +379,12 @@
                 openEdit (item,index) {
                     this.editedIndex = index
                     this.getRoleList()
-                    axios.get('/api/user/'+item.id).then((res) => {
-                        console.log(res.data)
+                    axios.get('/user/'+item.id).then((res) => {
+
                         this.editedItem = res.data.data
 
                         this.selectedRoles = this.editedItem.roles
-
+                        console.log(this.editedItem)
 
                     })
 
@@ -421,7 +418,7 @@
                     })*/
 
 
-                    axios.post('/api/user/save',{
+                    axios.post('/user',{
                             sys_user:this.editedItem,
                             sys_user_role_list:sysUserRoleList
                         }).then((res) => {
@@ -450,7 +447,7 @@
                     console.log(this.selected)
                     let ids = this.selected.map(item=>item.id)
                     console.log(ids)
-                    axios.delete('/api/user/'+ids.join(',')).then((res)=>{
+                    axios.delete('/user/'+ids.join(',')).then((res)=>{
                         this.selected.forEach((item) => {
                             this.desserts.splice(this.desserts.indexOf(item),1)
                         })
@@ -462,11 +459,12 @@
                     this.dialogDelete=false
                 },
                 getRoleList(){
-                   axios.get('/api/role',{
+                   axios.get('/roles',{
                        params: {
-                           index:1,
-                           size:999,
-                           asc:'name'
+                           pageIndex : 1,
+                           pageSize : 999,
+                           sortColumn : 'name',
+                           sortMethod : 'asc',
                        }
                    }).then((res)=>{
                        this.roleList = res.data.data.rows;

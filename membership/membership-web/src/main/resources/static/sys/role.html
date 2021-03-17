@@ -297,7 +297,7 @@
                     ...this.search
                 }
 
-                axios.get('/api/role/?', {
+                axios.get('/roles', {
                     params
                 },{
                     data:this.search
@@ -337,7 +337,7 @@
             },
             save (item,index) {
 
-                axios.post('/api/role',item).then((res) => {
+                axios.post('/role',item).then((res) => {
                     this.query()
                     this.closeEdit(item,index)
 
@@ -357,7 +357,7 @@
 
                 let ids = this.selectedItems.map(item=>item.id)
                 console.log(ids)
-                axios.delete('/api/role/'+ids.join(',')).then((res)=>{
+                axios.delete('/roles/'+ids.join(',')).then((res)=>{
                     this.selectedItems.forEach((item) => {
                         this.list.splice(this.list.indexOf(item),1)
                     })
@@ -402,7 +402,7 @@
             },
             openPermission(item){
 
-                axios.get(`/api/role/${item.id}/permission`).then(({data})=>{
+                axios.get(`/role/${item.id}/permissions`).then(({data})=>{
                     //console.log('permission',data)
                     this.editedItem = item
                     this.permissionList = data.data
@@ -422,7 +422,7 @@
                         'type':1
                     })
                 })
-                axios.post('/api/role/setPermission',permissionRelation).then(({data})=>{
+                axios.put('/role/permission',permissionRelation).then(({data})=>{
                     console.log(data)
                     this.closePermission()
                 })

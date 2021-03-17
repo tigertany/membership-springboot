@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@Anonymous
+//@Anonymous
 @RequestMapping(Constant.BASE_API_PATH)
 public class UserController {
 
@@ -80,8 +80,8 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    public JSONResult getUser(@RequestAttribute(value = Constant.CURUSER_ID, required = false) Long curUserId, @PathVariable Long id) {
-        UserWithRole userWithRole = userService.queryById(id == null ? curUserId : id);
+    public JSONResult getUser(@RequestAttribute(value = Constant.CURUSER_ID, required = false) Long curUserId, @PathVariable("id") Long id) {
+        UserWithRole userWithRole = userService.queryById(id == 0 ? curUserId : id);
         if (userWithRole != null) {
             return JSONResult.success(userWithRole);
         } else {
@@ -90,18 +90,18 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}/permissions")
-    public JSONResult getPermissionByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable Long id) {
-        return JSONResult.success(permissionService.getPermissionByUser(id == null ? curUserId : id));
+    public JSONResult getPermissionByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable("id") Long id) {
+        return JSONResult.success(permissionService.getPermissionByUser(id == 0 ? curUserId : id));
     }
 
     @GetMapping("/user/{id}/menus")
-    public JSONResult getMenuByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable Long id)
+    public JSONResult getMenuByUser(@RequestAttribute(Constant.CURUSER_ID) Long curUserId, @PathVariable("id") Long id)
     {
-        return JSONResult.success(permissionService.getMenusByUser(id == null ? curUserId : id));
+        return JSONResult.success(permissionService.getMenusByUser(id == 0 ? curUserId : id));
     }
 
     @DeleteMapping("/user/{ids}")//url:delete/1,2,3
-    public JSONResult delUser(@RequestAttribute(value = Constant.CURUSER_ID,required = false) Long curUserId,@PathVariable Long[] ids)
+    public JSONResult delUser(@RequestAttribute(value = Constant.CURUSER_ID) Long curUserId,@PathVariable("ids") Long[] ids)
     {
         if(userService.delete(curUserId,ids))
         {
