@@ -55,7 +55,7 @@ public class SysPermission implements Serializable {
     /**
      * 1=删除,0=未删除
      */
-    private Integer deleted;
+    private Boolean deleted;
 
 
     public Long getId() {
@@ -138,11 +138,11 @@ public class SysPermission implements Serializable {
         this.status = status;
     }
 
-    public Integer getDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Integer deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 

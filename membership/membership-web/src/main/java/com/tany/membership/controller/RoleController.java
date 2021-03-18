@@ -71,7 +71,7 @@ public class RoleController {
         {
             SysRole role = new SysRole();
             role.setId(ids[i]);
-            role.setDeleted(1);
+            role.setDeleted(true);
             role.setDeletedDate(new Date());
             list.add(role);
         }

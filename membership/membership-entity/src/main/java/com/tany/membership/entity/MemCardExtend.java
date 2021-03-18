@@ -49,7 +49,7 @@ public class MemCardExtend implements Serializable {
     /**
      * 1=删除,0=未删除
      */
-    private Integer deleted;
+    private Boolean deleted;
 
     private Long deleter;
 
@@ -152,11 +152,11 @@ public class MemCardExtend implements Serializable {
         this.updateDate = updateDate;
     }
 
-    public Integer getDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Integer deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 

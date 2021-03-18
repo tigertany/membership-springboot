@@ -1,10 +1,9 @@
 package com.tany.membership.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
 import java.util.Date;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
 
 /**
  * <p>
@@ -42,7 +41,7 @@ public class SysDept implements Serializable {
     /**
      * 1=删除,0=未删除
      */
-    private Integer deleted;
+    private Boolean deleted;
 
     private Long deleter;
 
@@ -129,11 +128,11 @@ public class SysDept implements Serializable {
         this.updateDate = updateDate;
     }
 
-    public Integer getDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Integer deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 

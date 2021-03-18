@@ -37,7 +37,7 @@ public class PermissionController {
 
     @DeleteMapping("/permission")
     public JSONResult delPermission(@RequestAttribute(value = Constant.CURUSER_ID,required = false) Long curUserId,SysPermission permission){
-        permission.setDeleted(1);
+        permission.setDeleted(true);
 
         if (permissionService.save(permission)) {
             return JSONResult.success("删除成功！");

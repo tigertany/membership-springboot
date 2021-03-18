@@ -75,7 +75,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         {
             SysUser user = new SysUser();
             user.setId(ids[i]);
-            user.setDeleted(1);
+            user.setDeleted(true);
             user.setDeletedDate(new Date());
             list.add(user);
         }

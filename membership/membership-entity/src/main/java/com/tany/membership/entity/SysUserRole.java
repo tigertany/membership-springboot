@@ -26,7 +26,7 @@ public class SysUserRole implements Serializable {
     /**
      * 1=删除,0=未删除
      */
-    private Integer deleted;
+    private Boolean deleted;
 
     private Long deleter;
 
@@ -65,11 +65,11 @@ public class SysUserRole implements Serializable {
         this.createDate = createDate;
     }
 
-    public Integer getDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Integer deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 
