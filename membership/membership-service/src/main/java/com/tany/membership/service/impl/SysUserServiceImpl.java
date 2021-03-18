@@ -8,7 +8,7 @@ import com.tany.membership.common.JWTUtil;
 import com.tany.membership.common.MyPage;
 import com.tany.membership.common.PagedResult;
 import com.tany.membership.dao.SysUserMapper;
-import com.tany.membership.dto.SaveUserAndRoles;
+import com.tany.membership.dto.UserWithRolesDto;
 import com.tany.membership.entity.SysUser;
 import com.tany.membership.entity.SysUserRole;
 import com.tany.membership.service.ISysUserRoleService;
@@ -51,12 +51,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean save(long curUserId,SaveUserAndRoles saveUserAndRoles) {
-        SysUser sysUser = saveUserAndRoles.getSysUser();
-        List<SysUserRole> sysUserRoleList = saveUserAndRoles.getSysUserRoleList();
+    public boolean save(long curUserId, UserWithRolesDto userWithRolesDto) {
+        SysUser sysUser = userWithRolesDto.getSysUser();
+        List<SysUserRole> sysUserRoleList = userWithRolesDto.getSysUserRoleList();
 
-        sysUser.setRecordDate(new Date());
-        sysUser.setRecorder(String.valueOf(curUserId));
+        sysUser.setCreateDate(new Date());
+        sysUser.setCreater(curUserId);
 
         QueryWrapper<SysUserRole> sysUserRoleQueryWrapper = new QueryWrapper<>();
         sysUserRoleQueryWrapper.eq("user_id",sysUser.getId());

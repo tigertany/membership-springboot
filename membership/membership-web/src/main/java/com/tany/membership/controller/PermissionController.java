@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
 @RestController
 //@Anonymous
 @RequestMapping(Constant.BASE_API_PATH)
@@ -40,7 +38,7 @@ public class PermissionController {
     @DeleteMapping("/permission")
     public JSONResult delPermission(@RequestAttribute(value = Constant.CURUSER_ID,required = false) Long curUserId,SysPermission permission){
         permission.setDeleted(1);
-        permission.setDeletedDate(new Date());
+
         if (permissionService.save(permission)) {
             return JSONResult.success("删除成功！");
         } else {

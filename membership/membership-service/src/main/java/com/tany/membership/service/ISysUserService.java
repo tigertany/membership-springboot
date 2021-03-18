@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tany.membership.common.MyPage;
 import com.tany.membership.common.PagedResult;
-import com.tany.membership.dto.SaveUserAndRoles;
+import com.tany.membership.dto.UserWithRolesDto;
 import com.tany.membership.entity.SysUser;
 import com.tany.membership.vo.UserWithRole;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 public interface ISysUserService extends IService<SysUser> {
     IPage<UserWithRole> getUserList(IPage<UserWithRole> page, Wrapper<UserWithRole> queryWrapper);
     List<UserWithRole> getUserList3(MyPage page, Wrapper<UserWithRole> queryWrapper);
-    boolean save(long curUserId,SaveUserAndRoles saveUserAndRoles);
+    boolean save(long curUserId, UserWithRolesDto userWithRolesDto);
     boolean delete(long curUserId,Long[] ids);
     PagedResult query(long pageIndex, long pageSize, String sortColumn, String sortMethod, Map<String,Object> search);
 

@@ -5,7 +5,7 @@ import com.tany.membership.entity.SysUserRole;
 
 import java.util.List;
 
-public class SaveUserAndRoles {
+public class UserWithRolesDto {
     private SysUser sysUser;
     private List<SysUserRole> sysUserRoleList;
 

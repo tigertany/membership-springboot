@@ -1,10 +1,11 @@
 package com.tany.membership.entity;
 
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * <p>
@@ -12,14 +13,14 @@ import java.io.Serializable;
  * </p>
  *
  * @author tany
- * @since 2021-01-20
+ * @since 2021-03-18
  */
 public class MemCardRecord implements Serializable {
 
     private static final long serialVersionUID=1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String cardNo;
 
@@ -37,22 +38,16 @@ public class MemCardRecord implements Serializable {
 
     private Integer placeId;
 
-    private Integer opr;
+    private Long opr;
 
     private Date oprDate;
 
-    private Integer deleted;
 
-    private Integer deleter;
-
-    private Date deletedDate;
-
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -120,11 +115,11 @@ public class MemCardRecord implements Serializable {
         this.placeId = placeId;
     }
 
-    public Integer getOpr() {
+    public Long getOpr() {
         return opr;
     }
 
-    public void setOpr(Integer opr) {
+    public void setOpr(Long opr) {
         this.opr = opr;
     }
 
@@ -134,30 +129,6 @@ public class MemCardRecord implements Serializable {
 
     public void setOprDate(Date oprDate) {
         this.oprDate = oprDate;
-    }
-
-    public Integer getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Integer deleted) {
-        this.deleted = deleted;
-    }
-
-    public Integer getDeleter() {
-        return deleter;
-    }
-
-    public void setDeleter(Integer deleter) {
-        this.deleter = deleter;
-    }
-
-    public Date getDeletedDate() {
-        return deletedDate;
-    }
-
-    public void setDeletedDate(Date deletedDate) {
-        this.deletedDate = deletedDate;
     }
 
     @Override
@@ -174,9 +145,6 @@ public class MemCardRecord implements Serializable {
         ", placeId=" + placeId +
         ", opr=" + opr +
         ", oprDate=" + oprDate +
-        ", deleted=" + deleted +
-        ", deleter=" + deleter +
-        ", deletedDate=" + deletedDate +
         "}";
     }
 }

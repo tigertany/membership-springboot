@@ -14,7 +14,7 @@ import java.util.Date;
  * @author tany
  * @since 2021-03-18
  */
-public class MemCardExtend implements Serializable {
+public class SysImage implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -23,20 +23,11 @@ public class MemCardExtend implements Serializable {
 
     private String name;
 
-    /**
-     * 1=男,0=女
-     */
-    private Integer gender;
+    private String path;
 
-    private String idcard;
+    private String ext;
 
-    private String tel;
-
-    private String avatar;
-
-    private String company;
-
-    private String tax;
+    private String category;
 
     private Long creater;
 
@@ -72,52 +63,28 @@ public class MemCardExtend implements Serializable {
         this.name = name;
     }
 
-    public Integer getGender() {
-        return gender;
+    public String getPath() {
+        return path;
     }
 
-    public void setGender(Integer gender) {
-        this.gender = gender;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public String getIdcard() {
-        return idcard;
+    public String getExt() {
+        return ext;
     }
 
-    public void setIdcard(String idcard) {
-        this.idcard = idcard;
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 
-    public String getTel() {
-        return tel;
+    public String getCategory() {
+        return category;
     }
 
-    public void setTel(String tel) {
-        this.tel = tel;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    public String getTax() {
-        return tax;
-    }
-
-    public void setTax(String tax) {
-        this.tax = tax;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Long getCreater() {
@@ -178,15 +145,12 @@ public class MemCardExtend implements Serializable {
 
     @Override
     public String toString() {
-        return "MemCardExtend{" +
+        return "SysImage{" +
         "id=" + id +
         ", name=" + name +
-        ", gender=" + gender +
-        ", idcard=" + idcard +
-        ", tel=" + tel +
-        ", avatar=" + avatar +
-        ", company=" + company +
-        ", tax=" + tax +
+        ", path=" + path +
+        ", ext=" + ext +
+        ", category=" + category +
         ", creater=" + creater +
         ", createDate=" + createDate +
         ", updater=" + updater +

@@ -1,9 +1,8 @@
 package com.tany.membership.controller;
 
-import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
-import com.tany.membership.dto.SaveUserAndRoles;
+import com.tany.membership.dto.UserWithRolesDto;
 import com.tany.membership.entity.SysUserRole;
 import com.tany.membership.service.ISysPermissionService;
 import com.tany.membership.service.ISysUserRoleService;
@@ -115,12 +114,12 @@ public class UserController {
 
 
 
-    @PostMapping("/user")//@RequestBody SaveUserAndRoles saveUserAndRoles
+    @PostMapping("/user")//@RequestBody UserWithRolesDto userWithRolesDto
     public JSONResult save(@RequestAttribute(value = Constant.CURUSER_ID, required = false) Long curUserId,
-                           @RequestBody SaveUserAndRoles saveUserAndRoles) {
-        //logger.info(saveUserAndRoles.toString());
+                           @RequestBody UserWithRolesDto userWithRolesDto) {
+        //logger.info(userWithRolesDto.toString());
 
-        if (userService.save(curUserId, saveUserAndRoles)) {
+        if (userService.save(curUserId, userWithRolesDto)) {
             return JSONResult.success("保存成功！");
         } else {
             return JSONResult.fail("保存失败！");

@@ -1,21 +1,23 @@
 package com.tany.membership.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author tany
- * @since 2021-01-20
+ * @since 2021-03-18
  */
 public class SysPermission implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    private Integer id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     private String name;
 
@@ -24,7 +26,7 @@ public class SysPermission implements Serializable {
      */
     private String type;
 
-    private Integer parentId;
+    private Long parentId;
 
     private String path;
 
@@ -50,15 +52,17 @@ public class SysPermission implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 1=删除,0=未删除
+     */
     private Integer deleted;
 
-    private Date deletedDate;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -78,11 +82,11 @@ public class SysPermission implements Serializable {
         this.type = type;
     }
 
-    public Integer getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(Integer parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
@@ -142,14 +146,6 @@ public class SysPermission implements Serializable {
         this.deleted = deleted;
     }
 
-    public Date getDeletedDate() {
-        return deletedDate;
-    }
-
-    public void setDeletedDate(Date deletedDate) {
-        this.deletedDate = deletedDate;
-    }
-
     @Override
     public String toString() {
         return "SysPermission{" +
@@ -163,6 +159,7 @@ public class SysPermission implements Serializable {
         ", icon=" + icon +
         ", sort=" + sort +
         ", status=" + status +
+        ", deleted=" + deleted +
         "}";
     }
 }

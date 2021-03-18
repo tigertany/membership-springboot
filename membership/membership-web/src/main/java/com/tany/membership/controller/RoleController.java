@@ -1,7 +1,6 @@
 package com.tany.membership.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.tany.membership.annotation.Anonymous;
 import com.tany.membership.common.Constant;
 import com.tany.membership.common.JSONResult;
 import com.tany.membership.entity.SysPermissionRelation;
@@ -91,8 +90,8 @@ public class RoleController {
                            @Validated @RequestBody SysRole role)
     {
         //logger.info(role.toString());
-        role.setRecordDate(new Date());
-        role.setRecorder(String.valueOf(curUserId));
+        role.setCreateDate(new Date());
+        role.setCreater(curUserId);
         if (roleService.saveOrUpdate(role)) {
             return JSONResult.success("保存成功！");
 
