@@ -10,12 +10,35 @@
         [v-cloak] {
             display: none;
         }
+        #login-page {
+            background-image: linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, 0.3),
+                    rgba(0, 0, 0, 0.3)
+            ),
+            url('../images/splash.jpg');
+            background-position: center;
+            background-size: cover;
+        }
+        .v-card--material__heading
+        {
+            position: relative;
+            top: -40px;
+            transition: .3s ease;
+            z-index: 1;
+        }
+        .v-application .display-3 {
+            font-size: 2.25rem !important;
+            line-height: 1.5em;
+            letter-spacing: -.0083333333em !important;
+        }
+
     </style>
 </head>
 <body>
 <div id="app" v-cloak>
     <v-app>
-        <v-container>
+        <!--<v-container>
             <v-row>
                 <v-col>
                     <v-card>
@@ -88,6 +111,76 @@
                     </v-card>
                 </v-col>
             </v-row>
+        </v-container>-->
+        <v-container fluid fill-height id="login-page">
+            <v-layout align-center justify-center>
+                <v-flex :style="{ 'max-width': '350px' }">
+                    <v-card class="v-card--material pa-3">
+                        <div class="d-flex grow flex-wrap">
+                            <v-sheet color="success"
+                                    width="100%"
+                                    elevation="6"
+                                    class="text-start v-card--material__heading mb-n6 pa-7"
+                                    dark
+                                     rounded
+                            >
+                        <div class="display-3 text-center">
+                            会员管理系统
+                        </div>
+                            </v-sheet>
+                        </div>
+                        <v-card-text>
+                            <transition name="fade" mode="out-in">
+                                <v-form ref="form" @submit.prevent="loginAction">
+                                    <!--<div class="text-right text-body-2">
+                                        <router-link :to="{ name: 'register' }">
+                                            {{ $t("auth.register") }} &gt;
+                                        </router-link>
+                                    </div>-->
+
+                                    <v-text-field
+                                            label="账号"
+                                            prepend-icon="mdi-account"
+                                            v-model="login.account"
+                                            required
+                                    ></v-text-field>
+
+                                    <div class="text-right text-body-2">
+                                        <!--<router-link to="">
+                                            忘记密码 &gt;
+                                        </router-link>-->
+                                    </div>
+
+                                    <v-text-field
+                                            label="密码"
+                                            prepend-icon="mdi-lock"
+                                            type="password"
+                                            v-model="login.pwd"
+                                            required
+                                    ></v-text-field>
+
+                                    <v-checkbox
+                                            v-model="login.remember"
+                                            label="记住我"
+                                    ></v-checkbox>
+
+                                    <div class="text-center">
+                                        <v-btn
+                                                color="success"
+                                                large
+                                                type="submit"
+                                                block
+                                                rounded
+                                        >
+                                            登录</v-btn
+                                        >
+                                    </div>
+                                </v-form>
+                            </transition>
+                        </v-card-text>
+                    </v-card>
+                </v-flex>
+            </v-layout>
         </v-container>
     </v-app>
 </div>
